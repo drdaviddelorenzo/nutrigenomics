@@ -1,7 +1,7 @@
 {
   "skill_id": "nutrigenomics",
   "name": "Nutrigenomics",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Generate personalised nutrition recommendations from your genetic data (23andMe, AncestryDNA, or VCF). Analyzes 40+ genes affecting nutrient metabolism, absorption, and food sensitivities. All processing is local\u2014your data stays private.",
   "author": "David de Lorenzo",
   "license": "MIT",

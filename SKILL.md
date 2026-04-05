@@ -7,7 +7,7 @@ metadata: {"openclaw": {"requires": {"bins": ["python3"]}, "emoji": "🧬"}}
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.0
+**Version**: 0.3.1
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+, pandas, numpy, matplotlib, seaborn, reportlab (optional)
@@ -171,6 +171,24 @@ only text files for documentation and integrity verification.
 
 ---
 
+## Execution
+
+To run the analysis on a user-provided genetic file, execute this command directly:
+
+```bash
+python {baseDir}/openclaw_adapter.py --input <path_to_genetic_file> --format auto
+```
+
+To run a demo without real genetic data (synthetic patient file included with the skill):
+
+```bash
+python {baseDir}/openclaw_adapter.py --input {baseDir}/tests/synthetic_patient.csv --format 23andme
+```
+
+`{baseDir}` is replaced by OpenClaw at runtime with the absolute path to this skill's folder. Do not substitute it manually. Output is written to a timestamped directory (`nutrigenomics_output_YYYYMMDD_HHMMSS/`) in the current working directory and persists until manually deleted.
+
+Supported `--format` values: `auto` (default), `23andme`, `ancestry`, `vcf`.
+
 ## Usage
 
 ```bash
@@ -183,8 +201,8 @@ openclaw "Run Nutrigenomics analysis on variants.vcf and flag any folate pathway
 # Targeted query
 openclaw "What does my APOE status mean for my saturated fat intake?"
 
-# Generate a random demo patient and run the report
-python examples/generate_patient.py --run
+# Run the demo report (no real genetic data needed)
+openclaw "Run a demo nutrigenomics report using the synthetic patient file"
 ```
 
 ---

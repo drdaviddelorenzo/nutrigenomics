@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.1] — 2026-04-05
+
+### Fixed
+- **`SKILL.md`** — Added `## Execution` section with explicit shell commands so the
+  agent knows how to invoke the analysis directly rather than responding
+  conversationally. Includes the standard invocation (`--input`, `--format auto`)
+  and a ready-to-run demo command using the bundled synthetic patient file.
+- Version bumped to 0.3.1 in `SKILL.md` and `openclaw.json`.
+
+---
+
 ## [0.3.0] — 2026-04-05
 
 ### Fixed
