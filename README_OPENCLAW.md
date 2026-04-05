@@ -108,14 +108,14 @@ Recommendations:
 
 **Your genetic data is 100% private.**
 
-- ✅ All analysis runs **locally** on your device
-- ✅ No data transmission to external servers
+- ✅ All analysis runs **locally** on your device — no data is sent to external servers
 - ✅ No account creation required
-- ✅ No genetic data stored after analysis
-- ✅ Reports contain only gene names, SNP IDs, and risk scores—never raw genotypes
-- ✅ Designed with GDPR, HIPAA, and privacy-first principles
+- ✅ Input file is never copied into the output directory
+- ✅ Reports include per-SNP genotype calls for the 58 analysed SNPs only — your full raw genome data is not reproduced
+- ✅ Output files persist in a local timestamped folder until you delete them
+- ✅ Designed with privacy-first principles
 
-You could share your final report with a healthcare provider without exposing sensitive genetic information.
+You can share your final report with a healthcare provider. Be aware it will include genotype calls for the 58 nutrition-related SNPs analysed (e.g. `CT` for MTHFR rs1801133), which is the information that makes the report actionable.
 
 ---
 
@@ -187,15 +187,19 @@ After analysis, you'll receive:
    - Which genes affect which nutrients
    - Color-coded risk levels
 
-4. **commands.sh** — Reproducibility documentation
-   - Full command used to generate your report
-   - Conda environment specifications
-   - SHA-256 checksums
+4. **README_reproducibility.txt** — Step-by-step instructions to reproduce the analysis
+   - No executable scripts are generated
 
-5. **provenance.json** — Analysis metadata
-   - Timestamp
-   - Software version
-   - Input file checksums
+5. **environment.yml** — Pinned conda environment for reproducibility
+
+6. **checksums.txt** — SHA-256 checksums of input and output files
+
+7. **provenance.json** — Analysis metadata
+   - Timestamp, software version, and input filename
+
+> **Note on file persistence**: output files are saved to a timestamped folder
+> (`nutrigenomics_output_YYYYMMDD_HHMMSS/`) in your working directory and remain
+> there until you delete them.
 
 ---
 

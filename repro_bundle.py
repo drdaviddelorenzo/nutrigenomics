@@ -44,7 +44,7 @@ def create_reproducibility_bundle(input_file: str, output_dir: str, panel_path: 
     cmd_args = " ".join(f"--{k.replace('_', '-')} {v}" for k, v in args.items() if v and k != "synthetic")
     instructions = f"""Nutrigenomics reproducibility notes
 Generated: {timestamp}
-Version: 0.2.3
+Version: 0.2.4
 
 This skill does not generate executable scripts. To reproduce the analysis manually:
 1. Create the conda environment from environment.yml
@@ -77,7 +77,7 @@ Local-only safety notes:
     # provenance.json
     provenance = {
         "tool": "Nutrigenomics",
-        "version": "0.1.0",
+        "version": "0.2.4",
         "timestamp": timestamp,
         "input_file": Path(input_file).name,
         "args": args,

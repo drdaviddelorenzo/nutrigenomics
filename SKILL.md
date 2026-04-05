@@ -1,8 +1,8 @@
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
-**Skill ID**: `nutrigenomics`  
-**Version**: 0.1.0  
-**Status**: MVP  
+**Skill ID**: `nutrigenomics`
+**Version**: 0.2.4
+**Status**: Beta
 **Author**: David de Lorenzo 
 **Requires**: Python 3.11+, pandas, numpy, matplotlib, seaborn, reportlab (optional)
 
@@ -17,10 +17,10 @@ peer-reviewed nutrigenomics literature, then translates genotype calls into
 actionable dietary and supplementation guidance — all computed locally.
 
 **Key outputs**
-- Markdown nutrition report with risk scores and recommendations
+- Markdown nutrition report with risk scores and per-SNP genotype calls
 - Radar chart of nutrient risk profile
 - Gene × nutrient heatmap
-- Reproducibility bundle (`commands.sh`, `environment.yml`, SHA-256 checksums)
+- Reproducibility bundle (`README_reproducibility.txt`, `environment.yml`, `checksums.txt`, `provenance.json`)
 
 ---
 
@@ -155,10 +155,13 @@ Outputs a structured Markdown report with:
 ### 5. Reproducibility Bundle (`repro_bundle.py`)
 
 Exports to the output directory (not committed to the repo):
-- `commands.sh` — full CLI to reproduce analysis
+- `README_reproducibility.txt` — step-by-step instructions to reproduce the analysis manually
 - `environment.yml` — pinned conda environment
 - `checksums.txt` — SHA-256 checksums of input and output files
-- `provenance.json` — timestamp and version information
+- `provenance.json` — timestamp, version, and input filename
+
+**Note**: No executable scripts are generated. The reproducibility bundle contains
+only text files for documentation and integrity verification.
 
 ---
 
@@ -214,9 +217,22 @@ skills/nutrigenomics/
 
 ## Privacy
 
-All computation runs **locally**. No genetic data is transmitted. Input files are
-read-only; no raw genotype data appears in any output file (reports contain only
-gene names, SNP IDs, and risk categories).
+All computation runs **locally** — no genetic data is ever transmitted to external
+servers or third-party services.
+
+**What the report contains**: The Markdown report includes per-SNP genotype calls
+(e.g. `AT`, `TT`) for each of the 58 panel SNPs analysed. This is intentional:
+knowing your specific genotype at each nutrition-related locus is what makes the
+report actionable. Full raw genome data from the input file is not reproduced in
+the report; only the 58 panel SNPs are included.
+
+**File persistence**: Output files (report, figures, reproducibility bundle) are
+written to a timestamped `nutrigenomics_output_YYYYMMDD_HHMMSS/` directory under
+the working directory and **persist on disk until manually deleted**. The input
+file is read-only and is never copied into the output directory.
+
+If you are running this skill on behalf of others or in a shared environment,
+delete the output directory once the user has downloaded their results.
 
 ---
 

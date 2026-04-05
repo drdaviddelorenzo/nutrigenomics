@@ -114,10 +114,10 @@ python examples/generate_patient.py --run
 - **Heatmap**: Gene-nutrient interaction matrix
 
 ### Reproducibility Package
-- `commands.sh` — Full CLI reproduction
-- `environment.yml` — Python environment
-- `checksums.txt` — Data validation
-- `provenance.json` — Analysis metadata
+- `README_reproducibility.txt` — Step-by-step instructions to reproduce the analysis
+- `environment.yml` — Pinned conda environment
+- `checksums.txt` — SHA-256 data validation checksums
+- `provenance.json` — Timestamp, version, and input filename metadata
 
 ---
 
@@ -166,7 +166,7 @@ See [ATTRIBUTION.md](ATTRIBUTION.md) for more information.
 ✅ **All processing is local** — Your genetic data never leaves your device
 ✅ **No external API calls** — No data transmission to third parties
 ✅ **No account required** — Complete anonymity
-✅ **Reports are safe** — Contains gene names and risk scores, never raw genotypes
+✅ **Reports are local** — Contains per-SNP genotype calls for the 58 analysed SNPs only; full raw genome data is never reproduced
 ✅ **Open source** — Code is auditable
 
 ---

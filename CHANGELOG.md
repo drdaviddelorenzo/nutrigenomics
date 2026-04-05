@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.4] — 2026-04-05
+
+### Security / Privacy
+
+- **`openclaw_adapter.py`** — Replaced `tempfile.mkdtemp` with an explicit
+  timestamped output directory (`nutrigenomics_output_YYYYMMDD_HHMMSS/`) created
+  under the working directory. Removes the false implication of auto-cleanup; output
+  files now persist until the caller explicitly deletes them. Added `cleanup_reminder`
+  key to the result dict so callers are reminded to delete the directory after use.
+  Removed unused `import tempfile`.
+
+- **`openclaw.json`** — Added `output_files_require_manual_cleanup: true` to the
+  features block. Updated the security `notes` field to accurately describe that
+  output files persist on disk until manually deleted and that the input file is
+  never copied into the output directory.
+
+### Documentation
+
+- **`SKILL.md`** — Multiple accuracy fixes:
+  - Removed erroneous `commands.sh` from the Key Outputs list and Algorithm step 5;
+    replaced with the actual reproducibility artefacts (`README_reproducibility.txt`,
+    `environment.yml`, `checksums.txt`, `provenance.json`).
+  - Rewrote the Privacy section to accurately state that: (a) reports *do* include
+    per-SNP genotype calls for the 58 panel SNPs by design; (b) full raw genome data
+    is not reproduced; (c) output files persist until manually deleted.
+  - Added note that no executable scripts are generated.
+  - Bumped version from `0.1.0` to `0.2.4`.
+
+- **`IMPLEMENTATION.md`** — Fixed the Security & Privacy checklist:
+  - Replaced false "Temp files cleaned — auto-cleanup" item with accurate description
+    of the timestamped output directory and manual cleanup responsibility.
+  - Replaced false "No data persistence" item with accurate "Persistence scope
+    documented" item clarifying that input is never copied but outputs persist.
+  - Updated "Last updated" date.
+
+- **`README.md`** — Fixed Reproducibility Package section (removed `commands.sh`,
+  corrected file list). Corrected Privacy section bullet that incorrectly claimed
+  reports never contain raw genotypes.
+
+- **`README_OPENCLAW.md`** — Fixed "What You'll Download" section (removed
+  `commands.sh`, corrected file list and descriptions). Corrected privacy bullet
+  points and the claim that reports never contain raw genotypes.
+
+### Changed
+
+- Version bumped to `0.2.4` in `openclaw.json`, `SKILL.md`, `generate_report.py`,
+  and `repro_bundle.py`.
+
+---
+
 ## [0.2.3] — 2026-02-28
 
 ### Added

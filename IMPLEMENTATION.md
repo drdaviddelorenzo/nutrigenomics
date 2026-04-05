@@ -252,11 +252,11 @@ matplotlib.use('Agg')  # Non-interactive backend
 Before submission, verify:
 
 - [ ] **No external API calls** — All processing is local
-- [ ] **No data persistence** — Genetic data not saved after analysis
+- [x] **Persistence scope documented** — The input file is never copied to the output directory. Output files (report, charts, checksums) persist in a timestamped `nutrigenomics_output_*/` directory and must be manually deleted after use.
 - [ ] **No network transmission** — Check with `strace` or network monitoring
 - [ ] **Input sanitisation** — File paths validated, no path traversal
 - [ ] **Error messages safe** — No sensitive data in exceptions
-- [ ] **Temp files cleaned** — Using `tempfile` with auto-cleanup
+- [x] **Output directory documented** — A timestamped `nutrigenomics_output_YYYYMMDD_HHMMSS/` directory is created under the working directory. There is no auto-cleanup; the caller is responsible for deleting it after the user retrieves their results.
 
 ### Verification Commands
 
@@ -437,5 +437,5 @@ Based on user feedback:
 
 ---
 
-*Last updated: February 2026*
+*Last updated: April 2026*
 *For OpenClaw v1.x+*

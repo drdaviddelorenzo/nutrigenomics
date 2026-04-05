@@ -19,7 +19,7 @@ Usage (via OpenClaw):
 
 import json
 import sys
-import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Tuple, Optional
 
@@ -113,9 +113,13 @@ class NutrigenomicsOpenClaw:
                 }
             
             # Set up output directory
+            # A timestamped directory is created under the working directory and
+            # persists on disk until the caller deletes it — there is no auto-cleanup.
             workspace_root = Path.cwd().resolve()
             if output_dir is None:
-                output_dir = tempfile.mkdtemp(prefix="nutrigenomics_", dir=str(workspace_root))
+                ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+                output_dir = str(workspace_root / f"nutrigenomics_output_{ts}")
+                Path(output_dir).mkdir(parents=True, exist_ok=True)
             
             output_path = validate_output_dir(output_dir, workspace_root)
             
@@ -195,7 +199,11 @@ class NutrigenomicsOpenClaw:
                 "figures": figures,
                 "summary": summary,
                 "risk_scores": risk_scores,
-                "output_dir": str(output_path)
+                "output_dir": str(output_path),
+                "cleanup_reminder": (
+                    f"Output files persist at '{str(output_path)}'. "
+                    "Delete this directory after the user has downloaded their results."
+                ),
             }
             
             print(f"[Nutrigenomics] Success! Results in: {output_path}/")
