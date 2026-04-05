@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.7] — 2026-04-05
+
+### Fixed
+- **`openclaw_adapter.py`** — `report_path` and `figures` values in the result
+  dict now return filenames relative to `output_dir`, rather than absolute system
+  paths. The caller already has `output_dir`; embedding redundant absolute paths
+  in additional fields exposed system path information for sensitive genomic data.
+- **`openclaw_adapter.py`** — `cleanup_reminder` no longer embeds the absolute
+  output path string; it now gives a generic instruction to delete `output_dir`
+  after the user has downloaded their results.
+- **`openclaw_adapter.py`** — Fixed inaccurate docstring on `analyse_file` that
+  described the default `output_dir` as a "temp directory"; it is a persistent
+  timestamped directory under the working directory.
+- **`openclaw.json`** — Updated `output_schema` to reflect that `report_path`
+  and `figures` are relative to `output_dir`; added `output_dir` field with
+  clarifying description.
+- Version strings bumped to 0.2.7 across `openclaw.json`, `SKILL.md`,
+  `generate_report.py`, and `repro_bundle.py`.
+
+---
+
 ## [0.2.6] — 2026-04-05
 
 ### Changed

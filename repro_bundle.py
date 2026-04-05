@@ -77,7 +77,7 @@ def create_reproducibility_bundle(
     )
     instructions = f"""Nutrigenomics reproducibility notes
 Generated: {timestamp}
-Version: 0.2.6
+Version: 0.2.7
 
 This skill does not generate executable scripts. To reproduce the analysis manually:
 1. Install the conda environment:
@@ -124,7 +124,7 @@ Privacy note:
     # persisting a personally identifiable label (e.g. "john_smith_genome.csv").
     provenance = {
         "tool": "Nutrigenomics",
-        "version": "0.2.6",
+        "version": "0.2.7",
         "timestamp": timestamp,
         "format_args": args,
         "privacy_note": (

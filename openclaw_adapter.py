@@ -94,16 +94,19 @@ class NutrigenomicsOpenClaw:
         Args:
             input_file: Path to genetic data file (23andMe, AncestryDNA, or VCF)
             file_format: Auto-detect or specify "23andme", "ancestry", "vcf"
-            output_dir: Where to save results (default: temp directory)
+            output_dir: Where to save results (default: timestamped directory
+                under the working directory; persists until manually deleted)
         
         Returns:
             Dict with keys:
             - "status": "success" or "error"
-            - "report_path": Path to generated Markdown report
-            - "figures": Dict of figure paths (radar.png, heatmap.png)
+            - "output_dir": Absolute path to the output directory
+            - "report_path": Filename of the Markdown report (relative to output_dir)
+            - "figures": Dict of figure filenames (relative to output_dir)
             - "summary": Executive summary as string
             - "risk_scores": Dict of nutrient risk scores
             - "message": Human-readable status message
+            - "cleanup_reminder": Reminder to delete output_dir after download
         """
         
         try:
@@ -202,24 +205,27 @@ class NutrigenomicsOpenClaw:
             # Prepare output summary
             summary = self._generate_summary(risk_scores, snp_calls)
             
-            # Locate generated figures
+            # Locate generated figures.
+            # Return filenames relative to output_dir — the caller can join
+            # them with output_dir to get the full path if needed.
+            # Absolute paths are intentionally not returned here to avoid
+            # embedding system paths in the result dict for sensitive data.
             figures = {}
             for fig_file in ["nutrigenomics_radar.png", "nutrigenomics_heatmap.png"]:
-                fig_path = output_path / fig_file
-                if fig_path.exists():
-                    figures[fig_file.replace(".png", "")] = str(fig_path)
-            
+                if (output_path / fig_file).exists():
+                    figures[fig_file.replace(".png", "")] = fig_file
+
             result = {
                 "status": "success",
                 "message": f"✅ Analysis complete. Panel coverage: {present}/{len(self.snp_panel)} SNPs ({coverage:.1f}%)",
-                "report_path": str(report_path),
-                "figures": figures,
+                "output_dir": str(output_path),
+                "report_path": "nutrigenomics_report.md",   # relative to output_dir
+                "figures": figures,                         # filenames relative to output_dir
                 "summary": summary,
                 "risk_scores": risk_scores,
-                "output_dir": str(output_path),
                 "cleanup_reminder": (
-                    f"Output files persist at '{str(output_path)}'. "
-                    "Delete this directory after the user has downloaded their results."
+                    "Output files persist in the output directory until manually deleted. "
+                    "Delete output_dir after the user has downloaded their results."
                 ),
             }
             
