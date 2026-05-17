@@ -182,3 +182,4 @@ cython_debug/
 .DS_Store
 examples/.DS_Store
 examples/.DS_Store
+brief.md
