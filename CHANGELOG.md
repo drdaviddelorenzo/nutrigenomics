@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.2] - 2026-05-17
+
+### Fixed
+- Excluded generated report output artefacts from local ClawHub publish scans so
+  releases contain only source, documentation, test fixtures, and panel data.
+- Aligned local version metadata across \`SKILL.md\`, \`openclaw.json\`, and the CLI
+  module banner for the \`0.3.2\` release.
+
+---
+
 ## [0.3.1] — 2026-04-05
 
 ### Fixed

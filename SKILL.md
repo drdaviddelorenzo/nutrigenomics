@@ -7,7 +7,7 @@ metadata: {"openclaw": {"requires": {"bins": ["python3"]}, "emoji": "🧬"}}
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.1
+**Version**: 0.3.2
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+, pandas, numpy, matplotlib, seaborn, reportlab (optional)
