@@ -1,6 +1,6 @@
 ---
 name: nutrigenomics
-description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 40+ genes affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
+description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
 metadata: {"openclaw": {"requires": {"bins": ["python3"]}, "emoji": "🧬"}}
 ---
 
@@ -44,6 +44,12 @@ The Bio Orchestrator should route to this skill when the user says anything like
 ---
 
 ## Curated SNP Panel
+
+> **Implemented panel: 28 SNPs across 24 genes, 12 nutrient domains** (see
+> `data/snp_panel.json`). The tables below also list **3 documented candidate variants not yet in
+> the scoring panel** — `ADRB2 rs1042713`, `HLA-DQ2` (proxy SNPs), and `GSTT1` (deletion) — which
+> require genotyping/scoring approaches not yet implemented. They are shown for scientific context;
+> the scorer evaluates only the 28 SNPs present in the JSON.
 
 ### Macronutrient Metabolism
 
@@ -244,10 +250,10 @@ All computation runs **locally** — no genetic data is ever transmitted to exte
 servers or third-party services.
 
 **What the report contains**: The Markdown report includes per-SNP genotype calls
-(e.g. `AT`, `TT`) for each of the 58 panel SNPs analysed. This is intentional:
+(e.g. `AT`, `TT`) for each of the 28 panel SNPs analysed. This is intentional:
 knowing your specific genotype at each nutrition-related locus is what makes the
 report actionable. Full raw genome data from the input file is not reproduced in
-the report; only the 58 panel SNPs are included.
+the report; only the 28 panel SNPs are included.
 
 **File persistence**: Output files (report, figures, reproducibility bundle) are
 written to a timestamped `nutrigenomics_output_YYYYMMDD_HHMMSS/` directory under
