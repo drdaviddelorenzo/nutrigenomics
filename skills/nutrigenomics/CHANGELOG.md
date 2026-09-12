@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.8] - 2026-09-12
+
+### Security
+- **Genotype calls are validated before they are scored or rendered.** Genotype values are read
+  from a user-supplied file and written into a Markdown code span in the report, so a backtick in
+  the genotype column broke out of that span exactly as a hostile filename did in 0.3.7 — this
+  was the same defect one field over, and 0.3.7 fixed only half of it. All three parsers now
+  accept only nucleotide calls (`A`, `C`, `G`, `T`, plus `D`/`I` for 23andMe deletions and
+  insertions, allowing a run so VCF indels still parse) and discard anything else rather than
+  scoring it. A value that is not a genotype cannot be biologically meaningful, so rejecting it
+  is also the scientifically correct behaviour. `generate_report` guards the value again at
+  render time, because `openclaw_adapter` and API callers supply genotypes directly without
+  passing through a parser. (ClawHub audit of 0.3.7: "Unvalidated Genotype Values Allow Markdown
+  and HTML Report Injection".)
+
+### Added
+- Regression tests covering accepted calls, rejected payloads, end-to-end discard of hostile
+  values at parse time, and the render-time guard.
+
+---
+
 ## [0.3.7] - 2026-09-12
 
 ### Security

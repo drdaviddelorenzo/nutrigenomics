@@ -289,3 +289,52 @@ def test_ordinary_filenames_are_left_readable():
     from generate_report import safe_display_filename
 
     assert safe_display_filename("/data/AncestryDNA (2026).txt") == "AncestryDNA (2026).txt"
+
+
+# ── Genotype values are untrusted input ───────────────────────────────────────
+# Regression test for the ClawHub audit of 0.3.7, "Unvalidated Genotype Values
+# Allow Markdown and HTML Report Injection": genotype calls are read from a
+# user-supplied file and rendered into a Markdown code span, so a backtick in
+# column 4 escaped it exactly as a hostile filename did.
+
+def test_clean_genotype_accepts_real_calls():
+    from parse_input import clean_genotype
+
+    assert clean_genotype("CT") == "CT"
+    assert clean_genotype("ct") == "CT"
+    assert clean_genotype("A-") == "A"
+    assert clean_genotype("DI") == "DI"          # 23andMe deletion/insertion
+    assert clean_genotype("ACGTACGT") == "ACGTACGT"  # VCF indel run
+
+
+def test_clean_genotype_rejects_anything_else():
+    from parse_input import clean_genotype
+
+    for hostile in ("`</code><script>alert(1)</script>`", "<img src=x onerror=y>",
+                    "|**INJECTED**|", "--", "", "XYZ", None, "A" * 40):
+        assert clean_genotype(hostile) is None, f"accepted {hostile!r}"
+
+
+def test_hostile_genotypes_never_reach_the_report(tmp_path):
+    from parse_input import parse_genetic_file
+
+    f = tmp_path / "hostile.txt"
+    f.write_text(
+        "rsid\tchromosome\tposition\tgenotype\n"
+        "rs1801133\t1\t11856378\tCT\n"
+        "rs4988235\t2\t136608646\tA`</code><script>x</script>`G\n",
+        encoding="utf-8",
+    )
+    table = parse_genetic_file(str(f), fmt="23andme")
+    assert table.get("rs1801133") == "CT"
+    assert "rs4988235" not in table, "hostile call was parsed instead of discarded"
+
+
+def test_render_guard_catches_values_bypassing_the_parser():
+    """openclaw_adapter and API callers can supply genotypes directly."""
+    from generate_report import safe_display_genotype
+
+    out = safe_display_genotype("A`<script>alert(1)</script>`G")
+    for ch in ("`", "<", ">", "(", ")"):
+        assert ch not in out, f"{ch!r} survived the render guard"
+    assert safe_display_genotype(None) == "--"

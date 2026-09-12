@@ -91,6 +91,22 @@ RECOMMENDATIONS = {
 }
 
 
+_SAFE_GENOTYPE_CHARS = re.compile(r"[^A-Za-z0-9/|]")
+
+
+def safe_display_genotype(genotype) -> str:
+    """
+    Render a genotype call safely for Markdown.
+
+    parse_input rejects non-nucleotide calls, but generate_report is also reached
+    directly by openclaw_adapter and by any caller passing a genotype dict, so the
+    value is guarded again at the point it is written into a code span.
+    """
+    if not genotype:
+        return "--"
+    return _SAFE_GENOTYPE_CHARS.sub("_", str(genotype))[:32]
+
+
 _SAFE_FILENAME_CHARS = re.compile(r"[^A-Za-z0-9 ._()\[\]-]")
 
 
@@ -200,7 +216,7 @@ def generate_report(snp_calls, risk_scores, snp_panel, output_dir, figures=True,
             for s in data["contributing_snps"]:
                 effect = s["effect_direction"].replace("_", " ").title()
                 lines.append(
-                    f"| {s['gene']} | {s['rsid']} | `{s['genotype']}` "
+                    f"| {s['gene']} | {s['rsid']} | `{safe_display_genotype(s['genotype'])}` "
                     f"| {s['risk_count']}/2 | {effect} |"
                 )
             lines.append("")
