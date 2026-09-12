@@ -208,3 +208,34 @@ def test_repro_bundle_does_not_record_input_path(tmp_path):
     provenance = _json.loads((out / "provenance.json").read_text(encoding="utf-8"))
     assert set(provenance["format_args"]) <= {"format", "no_figures", "custom_panel"}
     assert provenance["version"] != "0.2.8", "version must track the release, not be hardcoded"
+
+
+# ── Output writes must not follow symlinks ────────────────────────────────────
+# Regression test for the ClawHub audit finding "Symlink Following Vulnerability".
+# Output filenames are deterministic, so an attacker who can pre-create a symlink
+# at one of them could redirect a write outside the validated output directory.
+
+def test_safe_write_refuses_symlink(tmp_path):
+    from path_safety import safe_write_text
+
+    target = tmp_path / "escaped.txt"
+    link = tmp_path / "report.md"
+    link.symlink_to(target)
+
+    try:
+        safe_write_text(link, "payload")
+    except ValueError as exc:
+        assert "symbolic link" in str(exc)
+    else:
+        raise AssertionError("safe_write_text followed a symlink")
+
+    assert not target.exists(), "write escaped through the symlink"
+
+
+def test_safe_write_still_overwrites_regular_files(tmp_path):
+    from path_safety import safe_write_text
+
+    path = tmp_path / "report.md"
+    safe_write_text(path, "first")
+    safe_write_text(path, "second")
+    assert path.read_text(encoding="utf-8") == "second"

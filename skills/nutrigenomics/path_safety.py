@@ -9,6 +9,8 @@ touches them. Three checks are enforced:
   3. Existence — the file must actually exist before processing begins.
 """
 
+import errno
+import os
 from pathlib import Path
 
 
@@ -141,3 +143,34 @@ def validate_panel_file(panel_path: str, skill_root: Path) -> Path:
         raise ValueError(f"Panel path is not a file: {path}")
 
     return path
+
+
+def safe_open_write(path: Path, binary: bool = False):
+    """
+    Open ``path`` for writing, refusing to follow a symlink at the final component.
+
+    ``Path.write_text`` and ``open(..., "w")`` follow symlinks, so an attacker who
+    can pre-create a symlink at a predictable output filename (the output directory
+    and file names are deterministic) can redirect the write anywhere the user can
+    write — outside the directory validate_output_dir carefully confined us to.
+
+    O_NOFOLLOW makes the open fail with ELOOP instead. O_EXCL is deliberately not
+    used: overwriting a regular file on a re-run is legitimate and expected.
+    """
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW
+    try:
+        fd = os.open(str(path), flags, 0o600)
+    except OSError as exc:
+        if exc.errno in (errno.ELOOP, errno.EMLINK):
+            raise ValueError(
+                f"Refusing to write to '{path}': it is a symbolic link. "
+                f"Remove it and re-run."
+            ) from exc
+        raise
+    return os.fdopen(fd, "wb" if binary else "w", encoding=None if binary else "utf-8")
+
+
+def safe_write_text(path: Path, text: str) -> None:
+    """Write text to ``path`` without following a symlink at the final component."""
+    with safe_open_write(path) as fh:
+        fh.write(text)

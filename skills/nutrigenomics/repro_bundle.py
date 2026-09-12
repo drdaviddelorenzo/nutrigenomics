@@ -19,6 +19,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from path_safety import safe_write_text
+
 
 CONDA_ENV = """name: nutrigenomics
 channels:
@@ -26,13 +28,10 @@ channels:
   - defaults
 dependencies:
   - python=3.11
-  - numpy>=1.26
-  - pandas>=2.2
-  - matplotlib>=3.8
-  - seaborn>=0.13
-  - pip
-  - pip:
-    - reportlab>=4.0
+  - pandas>=2.2,<3.0
+  - numpy>=1.26,<3.0
+  - matplotlib>=3.8,<4.0
+  - seaborn>=0.13,<1.0
 """
 
 
@@ -114,10 +113,10 @@ Privacy note:
 - Only the SNP panel definition and the generated report are checksummed.
 - Output files in this directory persist until manually deleted.
 """
-    (output_dir / "README_reproducibility.txt").write_text(instructions, encoding="utf-8")
+    safe_write_text(output_dir / "README_reproducibility.txt", instructions)
 
     # ── environment.yml ───────────────────────────────────────────────────────
-    (output_dir / "environment.yml").write_text(CONDA_ENV, encoding="utf-8")
+    safe_write_text(output_dir / "environment.yml", CONDA_ENV)
 
     # ── checksums.txt — output files only, no input fingerprint ──────────────
     # Intentionally excludes the input file to avoid storing a hash that could
@@ -134,9 +133,7 @@ Privacy note:
         chk = sha256_file(fp)
         checksum_lines.append(f"{chk}  {label}")
 
-    (output_dir / "checksums.txt").write_text(
-        "\n".join(checksum_lines) + "\n", encoding="utf-8"
-    )
+    safe_write_text(output_dir / "checksums.txt", "\n".join(checksum_lines) + "\n")
 
     # ── provenance.json — no input filename or path ───────────────────────────
     # Only an explicit allowlist of non-identifying arguments is recorded. This
@@ -154,6 +151,4 @@ Privacy note:
             "Only output files are checksummed."
         ),
     }
-    (output_dir / "provenance.json").write_text(
-        json.dumps(provenance, indent=2), encoding="utf-8"
-    )
+    safe_write_text(output_dir / "provenance.json", json.dumps(provenance, indent=2))

@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.5] - 2026-09-12
+
+### Security
+- **Output writes no longer follow symbolic links.** Output filenames are deterministic, so an
+  attacker able to pre-create a symlink at one of them could redirect a write outside the
+  directory `validate_output_dir` confines the skill to. All seven artefact writes — the report,
+  both figures, and the four reproducibility files — now go through `safe_open_write`, which
+  opens with `O_NOFOLLOW` and refuses a symlinked path. `O_EXCL` is deliberately not used, so
+  re-running and overwriting a regular file still works. Verified by planting a symlink and
+  confirming the write is blocked. (ClawHub audit: "Symlink Following Vulnerability".)
+- **`reportlab` removed from the dependency list.** It was never imported anywhere in the skill,
+  yet was declared in `requirements.txt`, the conda environment and `openclaw.json`. It carried
+  the largest advisory history of any listed dependency, including remote code execution. Its
+  entire risk surface is removed by deleting an unused declaration.
+
+### Fixed
+- Dependencies now carry upper bounds (`pandas>=2.2,<3.0`, `numpy>=1.26,<3.0`,
+  `matplotlib>=3.8,<4.0`, `seaborn>=0.13,<1.0`), so a future major release cannot silently change
+  behaviour. `requirements.txt` and the generated conda environment previously specified
+  *different* floors for the same packages; they are now aligned.
+- Path validation failures print a clean `[ERROR]` message and exit 1 instead of a traceback.
+  Workspace confinement and symlink refusal are user-facing conditions, not defects.
+
+### Added
+- Regression tests covering symlink refusal and that overwriting a regular file still works.
+
+---
+
 ## [0.3.4] - 2026-09-12
 
 ### Fixed
