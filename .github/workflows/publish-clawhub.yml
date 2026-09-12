@@ -1,22 +1,29 @@
-# Publishes skills/<name>/ to ClawHub whenever the skill changes on main.
+# Publishes skills/<name>/ to ClawHub. MANUAL ONLY — see below.
 #
 # ClawHub and Hermes are both fed from this repository:
-#   - ClawHub  <- this workflow (clawhub skill publish)
+#   - ClawHub  <- the ClawHub web GitHub importer (current method), or this workflow
 #   - Hermes   <- `hermes skills tap add drdaviddelorenzo/nutrigenomics`, which reads skills/
 # so `skills/` is the layout both registries expect. Do not move it.
 #
-# Requires repository secret CLAWHUB_TOKEN: a CI-scoped token from the ClawHub dashboard.
-# Publishing is idempotent — the CLI compares the local bundle fingerprint against ClawHub and
-# exits successfully when the content is already published, so re-runs are safe.
+# This workflow is deliberately NOT triggered on push. It needs a repository secret
+# CLAWHUB_TOKEN, and without one every push would fail the run for no reason. ClawHub is
+# currently published via the web importer instead, which needs no token because it reads this
+# repository directly as the signed-in GitHub user.
+#
+# To switch back to automatic publishing: obtain a token with `clawhub login --device` (it
+# prints a one-time code and URL; authorise via GitHub and the CLI stores the token), add it as
+# the CLAWHUB_TOKEN repository secret, then restore the push trigger below. Publishing is
+# idempotent — the CLI compares the local bundle fingerprint against ClawHub and exits
+# successfully when the content is already published, so re-runs are safe.
+#
+#  on:
+#    push:
+#      branches: [main]
+#      paths: ['skills/**', '.github/workflows/publish-clawhub.yml']
 
 name: Publish to ClawHub
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'skills/**'
-      - '.github/workflows/publish-clawhub.yml'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -36,8 +43,6 @@ jobs:
     with:
       skill_path: skills/nutrigenomics
       owner: drdaviddelorenzo
-      # `inputs` does not exist on push events, so read github.event.inputs, which is null
-      # there: a manual run honours the checkbox, a push to main publishes for real.
-      dry_run: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' }}
+      dry_run: ${{ inputs.dry_run }}
     secrets:
       clawhub_token: ${{ secrets.CLAWHUB_TOKEN }}

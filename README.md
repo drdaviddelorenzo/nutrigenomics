@@ -41,12 +41,18 @@ requires the skill's `name` to match its parent directory. Moving this folder br
 
 ## Keeping the copies in sync
 
-This repository is the only place the skill is edited. Both registries are fed from it:
+This repository is the only place the skill is edited. **Both registries read from GitHub**,
+so neither holds an independent copy that can drift:
 
-| Target | How it is fed | Trigger |
+| Target | How it is fed | To update |
 |---|---|---|
-| **ClawHub** | `.github/workflows/publish-clawhub.yml` | merge to `main` touching `skills/**` |
+| **ClawHub** | ClawHub's GitHub importer, reading `skills/nutrigenomics/` | re-run the import after a release |
 | **Hermes skills hub** | `hermes skills tap add drdaviddelorenzo/nutrigenomics` | `hermes skills update` |
+
+Neither route needs an API token: the ClawHub importer reads this repository as the signed-in
+GitHub user, and the Hermes tap reads it anonymously. `.github/workflows/publish-clawhub.yml`
+offers token-based automatic publishing as an alternative, but it is manual-only (and dormant)
+unless a `CLAWHUB_TOKEN` secret is configured — see the comments at the top of that file.
 
 `SKILL.md` is deliberately **platform-neutral**: it documents commands as paths relative to the
 skill's own directory, and names each platform's convention for resolving them
