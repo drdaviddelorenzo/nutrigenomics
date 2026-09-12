@@ -26,6 +26,12 @@ on:
 
 jobs:
   publish:
+    # The called workflow requests id-token: write. A reusable workflow cannot hold more
+    # permission than its caller, and this repository's default is read-only, so the caller
+    # must grant these explicitly or the run fails at startup before any job begins.
+    permissions:
+      contents: read
+      id-token: write
     uses: openclaw/clawhub/.github/workflows/skill-publish.yml@v0.23.3
     with:
       skill_path: skills/nutrigenomics
