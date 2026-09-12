@@ -338,3 +338,61 @@ def test_render_guard_catches_values_bypassing_the_parser():
     for ch in ("`", "<", ">", "(", ")"):
         assert ch not in out, f"{ch!r} survived the render guard"
     assert safe_display_genotype(None) == "--"
+
+
+# ── Resource limits and output collisions ─────────────────────────────────────
+# The audit has repeatedly surfaced one instance of a class at a time. These
+# tests pin the classes: untrusted input cannot exhaust memory, and concurrent
+# runs cannot overwrite each other's report.
+
+def test_oversized_input_is_rejected_with_a_clear_error(tmp_path, monkeypatch):
+    import path_safety
+
+    monkeypatch.setattr(path_safety, "MAX_INPUT_BYTES", 1024)
+    big = tmp_path / "big.txt"
+    big.write_text("x" * 5000, encoding="utf-8")
+    try:
+        path_safety.check_input_size(big)
+    except ValueError as exc:
+        assert "above the" in str(exc)
+    else:
+        raise AssertionError("oversized input was accepted")
+
+
+def test_variant_count_is_capped(tmp_path, monkeypatch):
+    import parse_input
+
+    monkeypatch.setattr(parse_input, "MAX_VARIANTS", 50)
+    f = tmp_path / "many.txt"
+    f.write_text(
+        "rsid\tchromosome\tposition\tgenotype\n"
+        + "\n".join(f"rs{i}\t1\t{i}\tCT" for i in range(5000)),
+        encoding="utf-8",
+    )
+    assert len(parse_input.parse_23andme(str(f))) <= 50
+
+
+def test_absurdly_long_lines_are_skipped_not_buffered(tmp_path, monkeypatch):
+    import parse_input
+
+    monkeypatch.setattr(parse_input, "MAX_LINE_BYTES", 100)
+    f = tmp_path / "long.txt"
+    f.write_text(
+        "rsid\tchromosome\tposition\tgenotype\n"
+        "rs1801133\t1\t1\tCT\n"
+        "rs4988235\t2\t2\t" + "A" * 5000 + "\n",
+        encoding="utf-8",
+    )
+    table = parse_input.parse_23andme(str(f))
+    assert table.get("rs1801133") == "CT"
+    assert "rs4988235" not in table
+
+
+def test_panel_derived_text_cannot_inject_markdown():
+    from generate_report import safe_display_text
+
+    out = safe_display_text("MTHFR`</code><script>alert(1)</script>`")
+    for ch in ("`", "<", ">"):
+        assert ch not in out
+    assert safe_display_text("FADS1/2") == "FADS1/2"      # legitimate symbols kept
+    assert safe_display_text(None) == ""

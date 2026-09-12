@@ -18,6 +18,39 @@ from pathlib import Path
 ALLOWED_INPUT_EXTENSIONS = {".txt", ".csv", ".vcf"}
 
 
+# ── Resource limits ───────────────────────────────────────────────────────────
+# A genetic file is untrusted input. Parsing is streamed, but the genotype table
+# still grows with the number of variants, so streaming alone does not bound
+# memory. These caps are far above any real consumer export (23andMe ~600k
+# variants, ~25 MB; a whole-genome VCF is larger but still well inside them) and
+# exist so that a crafted or corrupt file fails with a clear error instead of
+# exhausting the machine.
+MAX_INPUT_BYTES = 512 * 1024 * 1024      # 512 MB
+MAX_VARIANTS = 10_000_000                # rows retained in the genotype table
+MAX_LINE_BYTES = 64 * 1024               # one variant line; real ones are < 100 B
+MAX_HEADER_LINES = 1000                  # lines inspected when sniffing the format
+
+
+def _human_bytes(n: int) -> str:
+    """Render a byte count readably at any magnitude."""
+    for unit in ("B", "KB", "MB", "GB"):
+        if n < 1024 or unit == "GB":
+            return f"{n:.0f} {unit}" if unit == "B" else f"{n:.1f} {unit}"
+        n /= 1024
+    return f"{n:.1f} GB"
+
+
+def check_input_size(path: Path) -> None:
+    """Raise ValueError if the input file exceeds MAX_INPUT_BYTES."""
+    size = path.stat().st_size
+    if size > MAX_INPUT_BYTES:
+        raise ValueError(
+            f"Input file is {_human_bytes(size)}, above the "
+            f"{_human_bytes(MAX_INPUT_BYTES)} limit. If this is a genuine genetic "
+            f"file, split it or raise MAX_INPUT_BYTES in path_safety.py."
+        )
+
+
 def validate_input_file(input_file: str) -> Path:
     """
     Validate a user-supplied genetic data file path.
@@ -58,6 +91,7 @@ def validate_input_file(input_file: str) -> Path:
     if not path.is_file():
         raise ValueError(f"Input path is not a file: {path}")
 
+    check_input_size(path)
     return path
 
 

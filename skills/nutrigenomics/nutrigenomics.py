@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 nutrigenomics.py — Nutrigenomics: Personalised Nutrition from Genetic Data
-Nutrigenomics Skill v0.3.8
+Nutrigenomics Skill v0.3.9
 
 Usage:
     python nutrigenomics.py --input genome.csv --output results/

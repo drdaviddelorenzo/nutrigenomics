@@ -91,6 +91,24 @@ RECOMMENDATIONS = {
 }
 
 
+_SAFE_TEXT_CHARS = re.compile(r"[^A-Za-z0-9 ._/()+-]")
+
+
+def safe_display_text(value, max_len: int = 64) -> str:
+    """
+    Render a panel-derived string safely for Markdown.
+
+    Gene symbols and effect descriptions come from data/snp_panel.json, which is
+    normally the skill's own file — but --panel accepts a caller-supplied panel,
+    and api-style callers build the panel themselves. Escaping here closes the
+    injection class for every value the report writes, not just the ones that
+    happen to be attacker-controlled today.
+    """
+    if not value:
+        return ""
+    return _SAFE_TEXT_CHARS.sub("_", str(value))[:max_len]
+
+
 _SAFE_GENOTYPE_CHARS = re.compile(r"[^A-Za-z0-9/|]")
 
 
@@ -214,9 +232,10 @@ def generate_report(snp_calls, risk_scores, snp_panel, output_dir, figures=True,
                 "|------|------|----------|:------------:|--------|",
             ]
             for s in data["contributing_snps"]:
-                effect = s["effect_direction"].replace("_", " ").title()
+                effect = safe_display_text(s["effect_direction"].replace("_", " ").title())
                 lines.append(
-                    f"| {s['gene']} | {s['rsid']} | `{safe_display_genotype(s['genotype'])}` "
+                    f"| {safe_display_text(s['gene'], 32)} | {safe_display_text(s['rsid'], 24)} "
+                    f"| `{safe_display_genotype(s['genotype'])}` "
                     f"| {s['risk_count']}/2 | {effect} |"
                 )
             lines.append("")

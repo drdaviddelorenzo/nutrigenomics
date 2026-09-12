@@ -1,7 +1,7 @@
 ---
 name: nutrigenomics
 description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-version: 0.3.8
+version: 0.3.9
 license: MIT
 compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
 metadata:
@@ -17,7 +17,7 @@ metadata:
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.8
+**Version**: 0.3.9
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+ (standard library only for the analysis; pandas, numpy, matplotlib and seaborn are needed only for figures)
@@ -342,6 +342,45 @@ Four Tier 2 entries carry caveats that a reader should know about:
 an effect independent of folate and B12 status, and larger in people with low vitamin B6.
 
 Treat Tier 2 scores as weaker signals than Tier 1 scores when interpreting a report.
+
+---
+
+## Threat Model and Limits
+
+The input is a genetic data file. It is treated as **untrusted**: it may not have come from the
+person reading the report, and everything derived from it reaches a Markdown document that is
+likely to be shared onward. Four classes of risk are handled explicitly, so that new instances
+are covered by an existing rule rather than fixed one at a time.
+
+**1. Untrusted values reaching the report.** Every value written into the report is filtered
+before rendering, not just the ones known to be attacker-controlled today: genotype calls, the
+input filename, and the gene, rsID and effect text taken from the SNP panel. Genotypes are
+additionally validated at parse time and non-nucleotide calls are discarded rather than scored.
+
+**2. Resource exhaustion.** Parsing streams, but a genotype table still grows with the number of
+variants, so streaming alone bounds nothing. Explicit caps in `path_safety.py`:
+
+| Limit | Value | Why |
+|---|---|---|
+| `MAX_INPUT_BYTES` | 512 MB | a 23andMe export is ~25 MB |
+| `MAX_VARIANTS` | 10,000,000 | a consumer export holds ~600,000 |
+| `MAX_LINE_BYTES` | 64 KB | a real variant line is under 100 bytes |
+| `MAX_HEADER_LINES` | 1,000 | only the header can identify a format |
+
+Exceeding the file limit fails with a clear error; the others discard the excess and carry on.
+
+**3. Filesystem safety.** Output is confined to the working directory, writes refuse to follow a
+symbolic link at either the file or its parent directory, and output directories are created
+exclusively with entropy added on collision, so concurrent runs cannot overwrite one another's
+report.
+
+**4. Provenance leakage.** No absolute path is written to any artefact. The input filename
+appears in the report header only, and is sanitised.
+
+**Out of scope.** Dependencies are declared with version bounds but not cryptographic hashes;
+the skill installs nothing itself, and the four packages involved are needed only for figures.
+The report necessarily contains per-SNP genotype calls — that is the point of it — and output
+files persist until deleted.
 
 ---
 

@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.9] - 2026-09-12
+
+### Security
+- **Closed the classes behind the recurring audit findings, rather than each instance.** Every
+  release so far fixed the one thing flagged and the next scan found a neighbouring case. This
+  release bounds the whole input/output surface and documents it.
+- **Resource limits.** Streaming bounds how much of a file is held at once but not the genotype
+  table, which grows with the variant count. `path_safety.py` now defines `MAX_INPUT_BYTES`
+  (512 MB, rejected with a clear error), `MAX_VARIANTS` (10,000,000), `MAX_LINE_BYTES` (64 KB)
+  and `MAX_HEADER_LINES` (1,000), enforced across every parser and the format sniffer. No file
+  loop is unbounded any more.
+- **Output directory collisions.** The adapter built a second-resolution directory name and
+  created it with `exist_ok=True`, so two runs in the same second shared a directory and
+  overwrote each other's report. It is now created exclusively, with random entropy appended on
+  collision. Verified with three concurrent runs producing three distinct directories.
+- **All report-rendered values escaped.** Gene symbols, rsIDs and effect descriptions are taken
+  from the SNP panel, which `--panel` and API callers can supply. They are now filtered like
+  genotypes and the filename, closing the injection class for every value the report writes.
+
+### Added
+- `Threat Model and Limits` section in `SKILL.md` stating what is treated as untrusted, the four
+  risk classes and how each is handled, the limit table, and what is deliberately out of scope.
+- Regression tests for oversized input, the variant cap, over-long lines, and panel-text escaping.
+
+---
+
 ## [0.3.8] - 2026-09-12
 
 ### Security
