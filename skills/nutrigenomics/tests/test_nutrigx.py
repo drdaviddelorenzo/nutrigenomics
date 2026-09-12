@@ -396,3 +396,43 @@ def test_panel_derived_text_cannot_inject_markdown():
         assert ch not in out
     assert safe_display_text("FADS1/2") == "FADS1/2"      # legitimate symbols kept
     assert safe_display_text(None) == ""
+
+
+# ── Palindromic (A/T, C/G) SNPs must never be strand-flipped ──────────────────
+# Flipping a palindromic genotype yields the other allele of the same pair, so
+# the flip always "succeeds" and converts homozygous reference into homozygous
+# risk. At rs9939609 (FTO, T/A) a TT call -- no risk alleles -- was normalised to
+# AA and scored 2. Three panel entries are palindromic.
+
+PALINDROMIC = ("rs12934922", "rs9939609", "rs1801282")
+
+
+def test_palindromic_snps_are_not_flipped():
+    panel = load_panel()
+    for rsid in PALINDROMIC:
+        entry = next(e for e in panel if e["rsid"] == rsid)
+        ref, risk = entry["ref_allele"], entry["risk_allele"]
+        assert {ref, risk} in ({"A", "T"}, {"C", "G"}), f"{rsid} is not palindromic"
+        for genotype, expected in ((ref * 2, 0), (ref + risk, 1), (risk * 2, 2)):
+            call = extract_snp_genotypes({rsid: genotype}, panel)[rsid]
+            assert call["risk_count"] == expected, (
+                f"{rsid} {genotype}: risk_count {call['risk_count']}, expected {expected}"
+            )
+
+
+def test_palindromic_calls_are_flagged_as_strand_ambiguous():
+    panel = load_panel()
+    entry = next(e for e in panel if e["rsid"] == "rs9939609")
+    call = extract_snp_genotypes({"rs9939609": entry["ref_allele"] * 2}, panel)["rs9939609"]
+    assert call.get("strand_ambiguous") is True
+
+    non_palindromic = extract_snp_genotypes({"rs1801133": "CC"}, panel)["rs1801133"]
+    assert non_palindromic.get("strand_ambiguous") is False
+
+
+def test_non_palindromic_snps_still_flip():
+    """rs4988235 is C/T vs G/A -- flipping is unambiguous and must still work."""
+    panel = load_panel()
+    for genotype in ("CC", "GG"):          # same call, opposite strands
+        call = extract_snp_genotypes({"rs4988235": genotype}, panel)["rs4988235"]
+        assert call["risk_count"] == 2, f"{genotype} should be 2 risk alleles"

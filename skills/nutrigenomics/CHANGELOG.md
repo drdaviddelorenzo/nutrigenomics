@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.10] - 2026-09-12
+
+### Fixed
+- **Palindromic SNPs were strand-flipped, inverting homozygous reference into homozygous risk.**
+  `extract_genotypes` falls back to a strand flip when the risk allele is not found in the
+  reported genotype. For a palindromic (A/T or C/G) SNP, flipping produces the other allele of
+  the same pair, so the flip *always* succeeds — and converts a call with no risk alleles into
+  one with two. At `rs9939609` (FTO, T/A) a `TT` call, meaning zero risk alleles, was normalised
+  to `AA` and scored 2 of 2.
+
+  Three panel entries are affected: `rs9939609` (FTO, carbohydrate), `rs12934922` (BCMO1,
+  vitamin A) and `rs1801282` (PPARG, fat metabolism). The A allele at rs9939609 runs around 40%
+  in European populations, so roughly a third of users are `TT` and every one of them was
+  reported at maximum FTO risk. **Results for these three SNPs change in every report generated
+  before this release.**
+
+  The module already contained `is_ambiguous()` for exactly this purpose, defined and never
+  called. It is now consulted: palindromic SNPs are never flipped, and the alleles are trusted as
+  reported, which is the only safe convention without allele-frequency context. Strand flipping
+  is unchanged for the other 25 SNPs, where it is unambiguous and necessary.
+
+### Added
+- `strand_ambiguous` on each call, so downstream consumers can qualify these three SNPs.
+- Regression tests covering all three genotypes at each palindromic SNP, the ambiguity flag, and
+  that legitimate flipping still works at `rs4988235`.
+
+---
+
 ## [0.3.9] - 2026-09-12
 
 ### Security
