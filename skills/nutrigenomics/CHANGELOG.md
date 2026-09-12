@@ -6,8 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-
-## [0.3.5] - 2026-09-12
+## [0.3.4] - 2026-09-12
 
 ### Fixed
 - **The reproducibility bundle recorded the path to the user's genetic data file.** Both
@@ -24,16 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the non-identifying flags.
 - Artefacts reported `Version: 0.2.8`, hardcoded in two places and three releases out of date.
   The version is now read from `openclaw.json` at runtime so it cannot drift from the release.
-
-### Added
-- Regression test asserting that no artefact in the reproducibility bundle contains the input
-  path, the input filename, or any local directory path.
-
----
-
-## [0.3.4] - 2026-09-12
-
-### Fixed
 - **`rs4988235` (MCM6 / lactase persistence) was scored backwards.** The reference and risk
   alleles were reversed, so the risk allele was set to the lactase *persistence* allele: an
   `AA` genotype scored 10/10 "elevated lactose risk" when it denotes full lactase persistence,
@@ -59,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected `CONTRIBUTORS.md` links that pointed at a repository other than this one.
 
 ### Added
+- Regression test asserting that no artefact in the reproducibility bundle contains the input
+  path, the input filename, or any local directory path.
 - **`Evidence Quality` section in `SKILL.md`**, splitting the panel into GWAS-backed (Tier 1)
   and candidate-gene-only (Tier 2) entries, and documenting four specific caveats: the CYP1A2
   caffeine effect is significant only in smokers and is an inducibility effect; VDR TaqI is
