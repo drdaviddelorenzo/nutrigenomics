@@ -1,7 +1,7 @@
 [
   {"rsid": "rs1801133", "gene": "MTHFR", "ref_allele": "C", "risk_allele": "T", "nutrient_domain": "folate", "weight": 0.85, "effect_direction": "decreased_folate_conversion", "pmid": "7647779"},
   {"rsid": "rs1801131", "gene": "MTHFR", "ref_allele": "A", "risk_allele": "C", "nutrient_domain": "folate", "weight": 0.50, "effect_direction": "decreased_folate_conversion", "pmid": "9545395"},
-  {"rsid": "rs1805087", "gene": "MTR",   "ref_allele": "A", "risk_allele": "G", "nutrient_domain": "folate", "weight": 0.40, "effect_direction": "increased_homocysteine_risk", "pmid": "11134235"},
+  {"rsid": "rs1805087", "gene": "MTR",   "ref_allele": "A", "risk_allele": "G", "nutrient_domain": "folate", "weight": 0.40, "effect_direction": "increased_homocysteine_risk", "pmid": "10520212"},
 
   {"rsid": "rs2228570", "gene": "VDR",   "ref_allele": "T", "risk_allele": "C", "nutrient_domain": "vitamin_d", "weight": 0.60, "effect_direction": "decreased_vitamin_d_response", "pmid": "9169350"},
   {"rsid": "rs731236",  "gene": "VDR",   "ref_allele": "T", "risk_allele": "C", "nutrient_domain": "vitamin_d", "weight": 0.55, "effect_direction": "decreased_vitamin_d_response", "pmid": "15315818"},
@@ -10,7 +10,7 @@
   {"rsid": "rs174546",  "gene": "FADS1", "ref_allele": "T", "risk_allele": "C", "nutrient_domain": "omega3", "weight": 0.80, "effect_direction": "decreased_lc_pufa_synthesis", "pmid": "25646338"},
   {"rsid": "rs1535",    "gene": "FADS2", "ref_allele": "G", "risk_allele": "A", "nutrient_domain": "omega3", "weight": 0.70, "effect_direction": "altered_omega6_omega3_ratio", "pmid": "34503513"},
   {"rsid": "rs953413",  "gene": "ELOVL2","ref_allele": "A", "risk_allele": "G", "nutrient_domain": "omega3", "weight": 0.60, "effect_direction": "decreased_dha_synthesis", "pmid": "21829377"},
-  {"rsid": "rs429358",  "gene": "APOE",  "ref_allele": "T", "risk_allele": "C", "nutrient_domain": "omega3", "weight": 0.50, "effect_direction": "increased_ldl_on_saturated_fat", "pmid": "25655249"},
+  {"rsid": "rs429358",  "gene": "APOE",  "ref_allele": "T", "risk_allele": "C", "nutrient_domain": "omega3", "weight": 0.50, "effect_direction": "increased_ldl_on_saturated_fat", "pmid": "41044249"},
 
   {"rsid": "rs7501331",  "gene": "BCMO1", "ref_allele": "C", "risk_allele": "T", "nutrient_domain": "vitamin_a", "weight": 0.70, "effect_direction": "decreased_beta_carotene_conversion", "pmid": "19103647"},
   {"rsid": "rs12934922", "gene": "BCMO1", "ref_allele": "A", "risk_allele": "T", "nutrient_domain": "vitamin_a", "weight": 0.60, "effect_direction": "decreased_beta_carotene_conversion", "pmid": "19103647"},

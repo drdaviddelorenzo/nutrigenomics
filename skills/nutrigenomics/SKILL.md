@@ -294,6 +294,51 @@ delete the output directory once the user has downloaded their results.
 
 ---
 
+## Evidence Quality
+
+Not every SNP in this panel rests on equally strong evidence, and the report does not weight
+them by evidence quality — only by effect size. Every citation in `data/snp_panel.json` has
+been checked against PubMed, and the panel splits into two tiers.
+
+**Tier 1 — GWAS-backed.** A catalogued genome-wide association exists for this exact variant
+and a trait matching its nutrient domain: MTHFR `rs1801133` and `rs1801131`, GC `rs4588`,
+FADS1 `rs174546`, FADS2 `rs1535`, ELOVL2 `rs953413`, APOE `rs429358` and `rs7412`,
+SLC23A1 `rs33972313`, ALPL `rs1256335`, FTO `rs9939609`, TCF7L2 `rs7903146`,
+PPARG `rs1801282`, APOA5 `rs662799`, AHR `rs4410790`, ADH1B `rs1229984`, ALDH2 `rs671`,
+MCM6 `rs4988235`.
+
+**Tier 2 — candidate-gene evidence only.** No catalogued genome-wide association for the
+assigned nutrient domain; the entry rests on functional or candidate-gene studies:
+BCMO1 `rs7501331` and `rs12934922`, VDR `rs2228570` and `rs731236`, MTR `rs1805087`,
+CYP1A2 `rs762551`, SOD2 `rs4880`, GPX1 `rs1050450`, NQO1 `rs1800566`, COMT `rs4680`.
+
+Four Tier 2 entries carry caveats that a reader should know about:
+
+- **`rs762551` (CYP1A2, caffeine)** — the widely used "fast vs slow caffeine metaboliser"
+  interpretation is weaker than usually presented. In the source study (Sachse et al. 1999),
+  caffeine metabolite ratios did **not** differ significantly between genotypes in 185
+  non-smokers; the effect appeared only in 51 smokers, and is best understood as an
+  inducibility effect. A contemporaneous study (Welfare et al. 1999) concluded that CYP1A2
+  shows no functionally significant polymorphism at all.
+- **`rs731236` (VDR, TaqI)** — the standard review of VDR polymorphisms describes the
+  BsmI/ApaI/TaqI cluster as probably non-functional, with observed associations attributed to
+  linkage disequilibrium with functional variants elsewhere in the gene. It is scored here as
+  a haplotype tag, not as a causal variant.
+- **`rs1050450` (GPX1, antioxidant)** — the phenotype study for this variant found no
+  significant difference in erythrocyte glutathione peroxidase activity between genotypes and
+  no association with stroke. It is retained for completeness; the evidence for a functional
+  effect on antioxidant defence is weak.
+- **`rs4680` (COMT, antioxidant)** — the three-to-four-fold effect on COMT enzyme activity is
+  well established, but COMT inactivates catecholamines and catechol drugs. Its placement in
+  the antioxidant domain reflects catechol handling rather than direct antioxidant defence.
+
+`rs1805087` (MTR) is a genuine but modest determinant of homocysteine; its source study reports
+an effect independent of folate and B12 status, and larger in people with low vitamin B6.
+
+Treat Tier 2 scores as weaker signals than Tier 1 scores when interpreting a report.
+
+---
+
 ## Limitations & Disclaimer
 
 1. **Not a medical device.** This skill provides educational, research-oriented

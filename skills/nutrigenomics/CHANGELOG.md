@@ -24,7 +24,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`rs4988235` cited an unrelated paper.** PMID 12369657 is a study of musculoskeletal pain in
   primary care. Replaced with PMID 11788828, the paper identifying the C/T-13910 variant.
 - `snp_raw_score` now raises on an unexpected `risk_count` instead of silently scoring 0.0.
+- **Every citation in the SNP panel was wrong except three.** An audit of all 23 unique PMIDs
+  against PubMed found 20 pointing at unrelated papers — the folate entries cited a study of
+  craniosynostosis, PPARG cited a paper on infant vaccination schedules, ALDH2 cited
+  *Drosophila* geotaxis, and the antioxidant entries cited work on thoracostomy,
+  glomerulonephritis and NK-cell receptors. Only FTO, TCF7L2 and BCMO1 cited the paper they
+  claimed. All 28 entries now cite a verified source, checked against PubMed, and preferentially
+  one with a catalogued genome-wide association for that exact variant and trait.
+  The panel's biology is substantially unchanged; its provenance was not supportable.
 - Corrected `CONTRIBUTORS.md` links that pointed at a repository other than this one.
+
+### Added
+- **`Evidence Quality` section in `SKILL.md`**, splitting the panel into GWAS-backed (Tier 1)
+  and candidate-gene-only (Tier 2) entries, and documenting four specific caveats: the CYP1A2
+  caffeine effect is significant only in smokers and is an inducibility effect; VDR TaqI is
+  probably non-functional and is scored as a haplotype tag; the GPX1 phenotype study found no
+  effect on erythrocyte glutathione peroxidase activity; and COMT's placement in the antioxidant
+  domain reflects catechol handling rather than antioxidant defence. Scores are not weighted by
+  evidence tier, so readers are told to treat Tier 2 signals as weaker.
 
 ### Credits
 - The `rs4988235` correction was identified and fixed by **krudo-taco** in the ClawBio `nutrigx`
