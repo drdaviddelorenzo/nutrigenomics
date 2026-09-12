@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.5] - 2026-09-12
+
+### Fixed
+- **The reproducibility bundle recorded the path to the user's genetic data file.** Both
+  `provenance.json` and `README_reproducibility.txt` echoed the full argument namespace, writing
+  the absolute path of the input file into artefacts that simultaneously stated "Input file name
+  and path are not recorded" and "The input file name and path are NOT stored in any artefact".
+  The module docstring, an inline comment and the artefacts themselves all asserted a privacy
+  property the code broke. Both artefacts now record only an explicit allowlist — `format`,
+  `no_figures`, and a `custom_panel` boolean — and never a path. Found by the ClawHub security
+  audit of 0.3.2 (finding T09, "Sensitive Genetic Input Path Persisted") and confirmed against
+  a real run, whose `provenance.json` contained the full path to a personal genome file.
+- The reproduce command printed in `README_reproducibility.txt` was malformed, emitting
+  `--input <your_genetic_file> --input /real/path/...`. It now shows only the placeholder and
+  the non-identifying flags.
+- Artefacts reported `Version: 0.2.8`, hardcoded in two places and three releases out of date.
+  The version is now read from `openclaw.json` at runtime so it cannot drift from the release.
+
+### Added
+- Regression test asserting that no artefact in the reproducibility bundle contains the input
+  path, the input filename, or any local directory path.
+
+---
+
 ## [0.3.4] - 2026-09-12
 
 ### Fixed

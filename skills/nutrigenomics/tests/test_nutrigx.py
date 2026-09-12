@@ -165,3 +165,46 @@ def test_rs4988235_gg_and_cc_are_non_persistent():
         assert result["call"]["risk_count"] == 2
         assert result["score"]["category"] == "Elevated"
         assert result["score"]["score"] == 10.0
+
+
+# ── Reproducibility bundle must not leak the input path ───────────────────────
+# Regression test for a privacy defect found by the ClawHub security audit of
+# 0.3.2: provenance.json and README_reproducibility.txt both echoed the full
+# argument namespace, writing the absolute path of the user's genetic data file
+# into artefacts that simultaneously claimed "the input file name and path are
+# NOT stored in any artefact".
+
+def test_repro_bundle_does_not_record_input_path(tmp_path):
+    import json as _json
+    from repro_bundle import create_reproducibility_bundle
+
+    secret = tmp_path / "jane_smith_genome_verysecret.csv"
+    secret.write_text("rsid\tchromosome\tposition\tgenotype\n", encoding="utf-8")
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "nutrigenomics_report.md").write_text("# report\n", encoding="utf-8")
+
+    create_reproducibility_bundle(
+        input_file=str(secret),
+        output_dir=str(out),
+        panel_path=str(PANEL),
+        args={
+            "input": str(secret),
+            "output": str(out),
+            "format": "23andme",
+            "panel": None,
+            "no_figures": False,
+        },
+    )
+
+    for artefact in out.iterdir():
+        if artefact.name == "nutrigenomics_report.md":
+            continue
+        text = artefact.read_text(encoding="utf-8", errors="replace")
+        assert str(secret) not in text, f"{artefact.name} leaks the input path"
+        assert secret.name not in text, f"{artefact.name} leaks the input filename"
+        assert str(tmp_path) not in text, f"{artefact.name} leaks a local path"
+
+    provenance = _json.loads((out / "provenance.json").read_text(encoding="utf-8"))
+    assert set(provenance["format_args"]) <= {"format", "no_figures", "custom_panel"}
+    assert provenance["version"] != "0.2.8", "version must track the release, not be hardcoded"
