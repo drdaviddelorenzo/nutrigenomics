@@ -1,7 +1,7 @@
 ---
 name: nutrigenomics
 description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-version: 0.3.6
+version: 0.3.7
 license: MIT
 compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
 metadata:
@@ -17,7 +17,7 @@ metadata:
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.6
+**Version**: 0.3.7
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+ (standard library only for the analysis; pandas, numpy, matplotlib and seaborn are needed only for figures)
@@ -283,6 +283,12 @@ servers or third-party services.
 knowing your specific genotype at each nutrition-related locus is what makes the
 report actionable. Full raw genome data from the input file is not reproduced in
 the report; only the 28 panel SNPs are included.
+
+**The input filename appears in the report header.** It is shown so you can tell which file a
+report came from, but a name like `jane_smith_genome.csv` identifies a person, and the report
+is the artefact most likely to be shared with a clinician. Rename the input file first if that
+matters to you. The filename is sanitised before it is written, so a name containing Markdown
+or HTML cannot inject content into the report; the full path is never recorded anywhere.
 
 **File persistence**: Output files (report, figures, reproducibility bundle) are
 written to a timestamped `nutrigenomics_output_YYYYMMDD_HHMMSS/` directory under

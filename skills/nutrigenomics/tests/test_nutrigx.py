@@ -261,3 +261,31 @@ def test_safe_write_refuses_symlinked_parent_directory(tmp_path):
     # a genuine directory is unaffected
     safe_write_text(real_dir / "report.md", "ok")
     assert (real_dir / "report.md").read_text(encoding="utf-8") == "ok"
+
+
+# ── Input filename must not inject Markdown into the report ───────────────────
+# Regression test for the ClawHub audit of 0.3.6, "Untrusted Input Filename
+# Embedded in Generated Markdown": the header wraps the filename in a code span,
+# so a backtick in the name escaped it and allowed arbitrary Markdown or HTML.
+
+def test_filename_cannot_break_out_of_the_code_span():
+    from generate_report import safe_display_filename
+
+    hostile = "/tmp/evil`</code><script>alert(1)</script>`.csv"
+    safe = safe_display_filename(hostile)
+    for ch in ("`", "<", ">", "/"):
+        assert ch not in safe, f"{ch!r} survived sanitisation"
+
+
+def test_filename_is_truncated_and_path_is_stripped():
+    from generate_report import safe_display_filename
+
+    assert safe_display_filename("/home/someone/genome.csv") == "genome.csv"
+    assert len(safe_display_filename("/x/" + "a" * 500 + ".csv")) <= 80
+    assert safe_display_filename("") == "(not recorded)"
+
+
+def test_ordinary_filenames_are_left_readable():
+    from generate_report import safe_display_filename
+
+    assert safe_display_filename("/data/AncestryDNA (2026).txt") == "AncestryDNA (2026).txt"

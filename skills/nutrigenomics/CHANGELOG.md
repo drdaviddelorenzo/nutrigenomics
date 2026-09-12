@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.7] - 2026-09-12
+
+### Security
+- **The input filename is sanitised before it is written into the report.** The report header
+  embeds the filename in a Markdown code span; a backtick in the name broke out of that span and
+  allowed arbitrary Markdown or HTML into the document. The name is a concern wherever the file
+  did not come from the person reading the report. It is now filtered to a conservative
+  allowlist and truncated. (ClawHub audit of 0.3.6: "Untrusted Input Filename Embedded in
+  Generated Markdown".)
+
+### Changed
+- `rs1535` (FADS2, omega-3) now cites Lemaitre et al. 2011, the CHARGE consortium meta-analysis
+  of plasma phospholipid n-3 fatty acids (PMID 21829377), which analyses this exact SNP and
+  reports weaker ALA-to-EPA conversion in minor allele carriers. It replaces a broader lipid
+  metabolite GWAS and matches the citation already used for `rs953413` in the same pathway.
+- `SKILL.md` now states that the input filename appears in the report header, why, and that
+  renaming the file beforehand is the way to avoid it.
+
+---
+
 ## [0.3.6] - 2026-09-12
 
 ### Security
