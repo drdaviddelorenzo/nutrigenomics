@@ -1,290 +1,66 @@
-# Nutrigenomics
+# Nutrigenomics — Agent Skill
 
-**Personalised nutrition recommendations from your genetic data**
+Personalised nutrition reports from consumer genetic data (23andMe, AncestryDNA, VCF),
+computed entirely on your own machine. This repository is the **canonical source** for the
+skill; the ClawHub and Hermes listings are published from here.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
-[![OpenClaw Compatible](https://img.shields.io/badge/OpenClaw-compatible-green)](https://openclaw.ai)
+The skill itself lives in **[`skills/nutrigenomics/`](skills/nutrigenomics/)** — see its
+[README](skills/nutrigenomics/README.md) for what it does, and
+[`SKILL.md`](skills/nutrigenomics/SKILL.md) for the agent-facing instructions.
 
----
+## Install
 
-## 🧬 What is Nutrigenomics?
-
-Nutrigenomics generates **personalised nutrition recommendations** based on your genetic profile. Upload your DNA file from 23andMe, AncestryDNA, or as a VCF file, and receive:
-
-- 📊 **Nutrient Risk Assessment** — How your genes affect nutrient absorption and metabolism
-- 🔍 **Gene-by-Gene Breakdown** — 24 genes across 12 nutrient domains
-- 📈 **Visual Reports** — Radar charts and interaction heatmaps
-- 💡 **Actionable Recommendations** — Dietary optimisation and supplementation guidance
-- 🔒 **100% Private** — All processing happens locally on your device
-
----
-
-## ✨ Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **24 Genes / 28 SNPs** | MTHFR, APOE, FTO, FADS1/2, VDR, CYP1A2, and more |
-| **12 Nutrient Domains** | Folate, vitamin D, omega-3, vitamin A/C/B6, carbohydrate, fat metabolism, caffeine, alcohol, lactose, antioxidant |
-| **Multi-Format Support** | 23andMe (.txt, .csv), AncestryDNA (.csv), VCF |
-| **Risk Scoring** | 0-10 scale per nutrient with evidence-based recommendations |
-| **Visualisations** | Radar chart (nutrient profile) + heatmap (gene-nutrient interactions) |
-| **Private** | All analysis runs locally—no data transmission |
-| **Open Source** | MIT licensed, community-driven |
-
----
-
-## 🚀 Quick Start
-
-### Via OpenClaw (Recommended for non-technical users)
-
-Once published to ClawHub:
+**Hermes Agent** — add this repository as a tap, then install:
 
 ```bash
-clawhub install nutrigenomics
+hermes skills tap add drdaviddelorenzo/nutrigenomics
+hermes skills install nutrigenomics
 ```
 
-Then tell OpenClaw: **"Generate my personalised nutrition report"** and upload your genetic data.
-
-### Manual Installation
-
-1. **Clone this repository**:
-   ```bash
-   git clone https://github.com/drdaviddelorenzo/nutrigenomics.git
-   cd nutrigenomics
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run analysis**:
-   ```bash
-   python openclaw_adapter.py \
-     --input your_genome.csv \
-     --format 23andme \
-     --output results/
-   ```
-
-4. **View results**:
-   ```bash
-   cat results/nutrigenomics_report.md
-   open results/nutrigenomics_radar.png
-   open results/nutrigenomics_heatmap.png
-   ```
-
----
-
-## 📖 Usage Examples
-
-### From 23andMe Data
-```bash
-python openclaw_adapter.py --input genome.txt --format 23andme
-```
-
-### From AncestryDNA
-```bash
-python openclaw_adapter.py --input ancestry.csv --format ancestry
-```
-
-### From VCF File
-```bash
-python openclaw_adapter.py --input variants.vcf --format vcf
-```
-
-### Generate Test Report
-```bash
-python examples/generate_patient.py --run
-```
-
----
-
-## 📊 What You'll Get
-
-### Personalised Report (Markdown)
-- Executive summary of top findings
-- Per-nutrient gene tables
-- Risk interpretations
-- Dietary recommendations
-- Supplement interaction guidance
-
-### Visual Outputs
-- **Radar Chart**: Nutrient risk profile
-- **Heatmap**: Gene-nutrient interaction matrix
-
-### Reproducibility Package
-- `README_reproducibility.txt` — Step-by-step instructions to reproduce the analysis
-- `environment.yml` — Pinned conda environment
-- `checksums.txt` — SHA-256 checksums of the SNP panel and output report (input file intentionally excluded)
-- `provenance.json` — Timestamp, version, and analysis settings (input filename intentionally not recorded)
-
----
-
-## 🧪 Testing
-
-Run the test suite:
+**OpenClaw / ClawHub:**
 
 ```bash
-pytest tests/test_nutrigenomics.py -v
+openclaw skills install @drdaviddelorenzo/nutrigenomics
 ```
 
-Generate a synthetic patient for testing:
+**Manually** — copy `skills/nutrigenomics/` into your agent's skills directory
+(`~/.hermes/skills/` for Hermes, `~/.claude/skills/` for Claude Code).
 
-```bash
-python examples/generate_patient.py --output tests/test_patient.csv
+## Repository layout
+
+```
+skills/nutrigenomics/                     the skill (SKILL.md, scripts, SNP panel, tests)
+.github/workflows/publish-clawhub.yml     publishes to ClawHub on merge to main
+LICENSE.txt                               MIT
 ```
 
----
+The `skills/` layout is what **both** registries expect, which is why it is fixed:
+`hermes skills tap add` looks for skills under `skills/<skill-name>/` and exposes no option to
+point elsewhere, and ClawHub's publish workflow defaults to the same `skills` root. ClawHub also
+requires the skill's `name` to match its parent directory. Moving this folder breaks both.
 
-## 📚 Documentation
+## Keeping the copies in sync
 
-- **[SKILL.md](SKILL.md)** — OpenClaw skill instructions
-- **[README_OPENCLAW.md](README_OPENCLAW.md)** — Comprehensive user guide
-- **[ATTRIBUTION.md](ATTRIBUTION.md)** — Scientific citations and credits
-- **[CONTRIBUTORS.md](CONTRIBUTORS.md)** — How to contribute
-- **[CHANGELOG.md](CHANGELOG.md)** — Version history and roadmap
+This repository is the only place the skill is edited. Both registries are fed from it:
 
----
+| Target | How it is fed | Trigger |
+|---|---|---|
+| **ClawHub** | `.github/workflows/publish-clawhub.yml` | merge to `main` touching `skills/**` |
+| **Hermes skills hub** | `hermes skills tap add drdaviddelorenzo/nutrigenomics` | `hermes skills update` |
 
-## 🔬 Scientific Foundation
+`SKILL.md` is deliberately **platform-neutral**: it documents commands as paths relative to the
+skill's own directory, and names each platform's convention for resolving them
+(`${HERMES_SKILL_DIR}` for Hermes, `{baseDir}` for OpenClaw) rather than hard-coding either. A
+previous hand-edited Hermes copy drifted from this repository for six weeks precisely because
+those tokens were being substituted by hand — do not reintroduce per-platform copies.
 
-This skill is informed by peer-reviewed nutrigenomics research. For scientific details and verification:
+**Bump the `version` in `SKILL.md` frontmatter for every published change.** ClawHub publishes
+are fingerprinted and versioned; leaving two different file sets on the same version number is
+what makes drift invisible.
 
-- **PubMed**: https://pubmed.ncbi.nlm.nih.gov/
-- **GWAS Catalog**: https://www.ebi.ac.uk/gwas/
-- **ClinVar**: https://www.ncbi.nlm.nih.gov/clinvar/
+## Licence
 
-Users should consult these authoritative sources and healthcare providers for specific scientific claims.
+MIT — see [LICENSE.txt](LICENSE.txt). Attribution, citation formats and data-source credits are
+in [ATTRIBUTION.md](skills/nutrigenomics/ATTRIBUTION.md).
 
-See [ATTRIBUTION.md](ATTRIBUTION.md) for more information.
-
----
-
-## 🔒 Privacy & Security
-
-✅ **All processing is local** — Your genetic data never leaves your device
-✅ **No external API calls** — No data transmission to third parties
-✅ **No account required** — Complete anonymity
-✅ **Reports are local** — Contains per-SNP genotype calls for the 28 analysed SNPs only; full raw genome data is never reproduced
-✅ **Open source** — Code is auditable
-
----
-
-## ⚠️ Important Disclaimer
-
-Nutrigenomics provides **educational, research-oriented analysis**. It does **NOT**:
-- Constitute medical diagnosis
-- Replace healthcare provider consultation
-- Provide medical advice
-- Diagnose nutrient deficiencies
-
-**Always consult qualified healthcare providers** before making significant dietary changes or starting supplements.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTORS.md](CONTRIBUTORS.md) for:
-
-- How to report bugs
-- How to suggest SNPs
-- How to improve documentation
-- How to contribute code
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) file for details.
-
-**You are free to:**
-- ✅ Use it (personal, educational, commercial)
-- ✅ Modify it
-- ✅ Distribute it
-
-**You must:**
-- 📋 Include the MIT License
-- 📋 Give appropriate credit
-
----
-
-## 👤 Author
-
-**David de Lorenzo**
-
-- 🐙 **GitHub**: [@drdaviddelorenzo](https://github.com/drdaviddelorenzo)
-- 🌐 **Website**: https://drdaviddelorenzo.github.io
-- 📧 **Email**: david@drdaviddelorenzo.dev
-
----
-
-## 📖 How to Cite
-
-If you use Nutrigenomics in research or education:
-
-### BibTeX
-```bibtex
-@software{delorenzo2026nutrigenomics,
-  author = {de Lorenzo, David},
-  title = {Nutrigenomics: Personalised Nutrition from Genetic Data},
-  year = {2026},
-  url = {https://github.com/drdaviddelorenzo/nutrigenomics},
-  version = {0.2.3}
-}
-```
-
-### APA
-de Lorenzo, D. (2026). *Nutrigenomics: Personalised nutrition from genetic data* (Version 0.2.3) [Software]. Retrieved from https://github.com/drdaviddelorenzo/nutrigenomics
-
-See [ATTRIBUTION.md](ATTRIBUTION.md) for more citation formats.
-
----
-
-## 🗺️ Roadmap
-
-- [ ] **v0.3.0** — Microbiome integration (16S rRNA input)
-- [ ] **v0.4.0** — Longitudinal tracking (compare reports over time)
-- [ ] **v0.5.0** — HLA typing for immune-mediated food reactions
-- [ ] **v1.0.0** — Multi-omics integration (metabolomics + genomics)
-- [ ] **v1.5.0** — Integration with maternal nutrition risk scoring
-
----
-
-## 📞 Support
-
-- **GitHub Issues**: Report bugs or suggest features
-- **GitHub Discussions**: Ask questions, share ideas
-- **Email**: david@drdaviddelorenzo.dev
-- **OpenClaw Discord**: discord.gg/clawd
-
----
-
-## 🙏 Acknowledgments
-
-
-- **OpenClaw team** for web platform integration
-- **Nutrigenomics researchers** for foundational research
-- **GWAS Catalog** and **ClinVar** for genetic data
-- **Community contributors** for improvements and feedback
-
----
-
-## 🔗 Links
-
-- **GitHub Repository**: https://github.com/drdaviddelorenzo/nutrigenomics
-- **My Website**: https://drdaviddelorenzo.github.io
-- **OpenClaw**: https://openclaw.ai
-- **ClawHub Registry**: https://clawhub.com
-
----
-
-<div align="center">
-
-**Nutrigenomics: Democratising personalised nutrition through open science and genetic literacy**
-
-Made with 🧬 and ❤️ for health-conscious individuals everywhere
-
-*MIT Licensed | Built by David de Lorenzo | Community-driven*
-
-</div>
+> **Disclaimer:** educational and research use only. Not medical advice.

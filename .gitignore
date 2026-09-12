@@ -183,3 +183,7 @@ cython_debug/
 examples/.DS_Store
 examples/.DS_Store
 brief.md
+
+# Skill output directories
+nutrigenomics_results/
+nutrigenomics_output_*/

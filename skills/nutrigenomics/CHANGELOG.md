@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.3] - 2026-09-12
+
+### Changed
+- **`SKILL.md` is now platform-neutral.** Commands are documented relative to the skill's own
+  directory, with each platform's path convention (`${HERMES_SKILL_DIR}`, `{baseDir}`) named
+  rather than hard-coded, so one file serves OpenClaw/ClawHub and Hermes without per-platform
+  edits. Example invocations use `nutrigenomics.py`; `openclaw_adapter.py` remains the
+  structured entry point declared in `openclaw.json`.
+- **Corrected the advertised panel size.** Earlier releases described the skill as analysing
+  "40+ genes" / "58 SNPs" across "8 nutrient categories". The implemented panel
+  (`data/snp_panel.json`) has always contained **28 SNPs across 24 genes and 12 nutrient
+  domains**, and the generated report has always stated the true count. Documentation,
+  `SKILL.md` frontmatter and `openclaw.json` metadata now match the implementation.
+  The scope of the skill is unchanged — only its description was wrong. Users who installed
+  an earlier release from ClawHub will see the advertised coverage decrease accordingly.
+  (The correction landed in the repository on 2026-07-01 but was never released; this is the
+  first version to carry it to ClawHub and the Hermes skills hub.)
+
+### Added
+- `metadata.hermes` frontmatter (tags, category) so the skill is indexed correctly by the
+  Hermes skills hub, alongside the existing `metadata.openclaw` block.
+- Top-level `version`, `license` and `compatibility` frontmatter fields, per the
+  agentskills.io skill specification.
+- `.github/workflows/publish-clawhub.yml`, publishing this skill to ClawHub on merge to `main`
+  so the registry copy can no longer fall behind the repository.
+
+### Fixed
+- Repository restructured to `skills/nutrigenomics/` so that `hermes skills tap add` can
+  discover the skill; the Hermes tap resolver looks only under `skills/` and offers no way to
+  point at a repository root.
+- Added skill output directories (`nutrigenomics_results/`, `nutrigenomics_output_*/`) to
+  `.gitignore`. These contain per-SNP genotype calls when the skill is run on real data and
+  must never be committed or published.
+
+---
+
 ## [0.3.2] - 2026-05-17
 
 ### Fixed

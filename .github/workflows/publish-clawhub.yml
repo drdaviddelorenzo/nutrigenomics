@@ -1,0 +1,36 @@
+# Publishes skills/<name>/ to ClawHub whenever the skill changes on main.
+#
+# ClawHub and Hermes are both fed from this repository:
+#   - ClawHub  <- this workflow (clawhub skill publish)
+#   - Hermes   <- `hermes skills tap add drdaviddelorenzo/nutrigenomics`, which reads skills/
+# so `skills/` is the layout both registries expect. Do not move it.
+#
+# Requires repository secret CLAWHUB_TOKEN: a CI-scoped token from the ClawHub dashboard.
+# Publishing is idempotent — the CLI compares the local bundle fingerprint against ClawHub and
+# exits successfully when the content is already published, so re-runs are safe.
+
+name: Publish to ClawHub
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - '.github/workflows/publish-clawhub.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview only — no publish
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    uses: openclaw/clawhub/.github/workflows/skill-publish.yml@v0.23.3
+    with:
+      skill_path: skills/nutrigenomics
+      owner: drdaviddelorenzo
+      # On a manual run, honour the dry_run checkbox; on a push to main, publish for real.
+      dry_run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+    secrets:
+      clawhub_token: ${{ secrets.CLAWHUB_TOKEN }}

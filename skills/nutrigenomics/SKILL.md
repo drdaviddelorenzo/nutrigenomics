@@ -1,13 +1,23 @@
 ---
 name: nutrigenomics
-description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-metadata: {"openclaw": {"requires": {"bins": ["python3"]}, "emoji": "🧬"}}
+description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
+version: 0.3.3
+license: MIT
+compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
+metadata:
+  openclaw:
+    requires:
+      bins: [python3]
+    emoji: "🧬"
+  hermes:
+    tags: [genetics, nutrition, nutrigenomics, health, 23andme, ancestrydna, vcf]
+    category: health
 ---
 
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.2
+**Version**: 0.3.3
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+, pandas, numpy, matplotlib, seaborn, reportlab (optional)
@@ -179,37 +189,51 @@ only text files for documentation and integrity verification.
 
 ## Execution
 
-To run the analysis on a user-provided genetic file, execute this command directly:
+To run the analysis on a user-provided genetic file:
 
 ```bash
-python {baseDir}/openclaw_adapter.py --input <path_to_genetic_file> --format auto
+python <skill-dir>/nutrigenomics.py --input <path_to_genetic_file> --format auto
 ```
 
 To run a demo without real genetic data (synthetic patient file included with the skill):
 
 ```bash
-python {baseDir}/openclaw_adapter.py --input {baseDir}/tests/synthetic_patient.csv --format 23andme
+python <skill-dir>/nutrigenomics.py --input <skill-dir>/tests/synthetic_patient.csv --format 23andme
 ```
 
-`{baseDir}` is replaced by OpenClaw at runtime with the absolute path to this skill's folder. Do not substitute it manually. Output is written to a timestamped directory (`nutrigenomics_output_YYYYMMDD_HHMMSS/`) in the current working directory and persists until manually deleted.
+**Two rules make these commands work, and both matter.**
+
+**1. Replace `<skill-dir>` with the absolute path to this skill's folder.** Each platform
+supplies it:
+
+- **Hermes** states it as `[Skill directory: ...]` when it loads this skill, and substitutes
+  `${HERMES_SKILL_DIR}` anywhere that token appears.
+- **OpenClaw** substitutes `{baseDir}` at runtime — e.g.
+  `python {baseDir}/nutrigenomics.py --input ...`. Do not substitute it manually.
+- Otherwise, use the literal absolute path of the skill folder.
+
+**2. Run from the user's working directory — never `cd` into the skill folder.** The script
+confines output to the current working directory (`path_safety.validate_output_dir`), so the
+working directory decides where the report lands. Running from the user's directory puts it
+there, which is correct. Running from inside the skill folder makes the skill folder the *only*
+permitted destination, writing a report full of per-SNP genotype calls into the skill itself —
+where it is liable to be swept into a publish, a commit, or a shared bundle.
+
+Output is written to the directory named by `--output` (default: `nutrigenomics_results/`),
+created under the current working directory, and persists until manually deleted. OpenClaw's
+structured entry point (`openclaw_adapter.py`, declared in `openclaw.json`) instead defaults to
+a timestamped `nutrigenomics_output_YYYYMMDD_HHMMSS/` directory.
 
 Supported `--format` values: `auto` (default), `23andme`, `ancestry`, `vcf`.
 
 ## Usage
 
-```bash
-# From 23andMe raw data
-openclaw "Generate my personalised nutrition report from genome.csv"
+Ask the agent in plain language — it routes to this skill and runs the command above:
 
-# From VCF
-openclaw "Run Nutrigenomics analysis on variants.vcf and flag any folate pathway risks"
-
-# Targeted query
-openclaw "What does my APOE status mean for my saturated fat intake?"
-
-# Run the demo report (no real genetic data needed)
-openclaw "Run a demo nutrigenomics report using the synthetic patient file"
-```
+- "Generate my personalised nutrition report from genome.csv"
+- "Run a nutrigenomics analysis on variants.vcf and flag any folate pathway risks"
+- "What does my APOE status mean for my saturated fat intake?"
+- "Run a demo nutrigenomics report using the synthetic patient file"
 
 ---
 
