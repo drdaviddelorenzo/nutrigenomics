@@ -157,9 +157,28 @@ def safe_open_write(path: Path, binary: bool = False):
     O_NOFOLLOW makes the open fail with ELOOP instead. O_EXCL is deliberately not
     used: overwriting a regular file on a re-run is legitimate and expected.
     """
+    path = Path(path)
     flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW
+
+    # O_NOFOLLOW guards only the FINAL component, so a symlinked parent directory
+    # would still redirect the write. Open the parent itself with O_NOFOLLOW and
+    # O_DIRECTORY, then create the file relative to that descriptor: the fd pins a
+    # real directory inode, so swapping the parent for a symlink afterwards cannot
+    # move the write. (ClawHub audit: parent-directory symlink race.)
     try:
-        fd = os.open(str(path), flags, 0o600)
+        dir_fd = os.open(
+            str(path.parent), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        )
+    except OSError as exc:
+        if exc.errno in (errno.ELOOP, errno.ENOTDIR):
+            raise ValueError(
+                f"Refusing to write into '{path.parent}': it is a symbolic link, "
+                f"not a real directory."
+            ) from exc
+        raise
+
+    try:
+        fd = os.open(path.name, flags, 0o600, dir_fd=dir_fd)
     except OSError as exc:
         if exc.errno in (errno.ELOOP, errno.EMLINK):
             raise ValueError(
@@ -167,6 +186,9 @@ def safe_open_write(path: Path, binary: bool = False):
                 f"Remove it and re-run."
             ) from exc
         raise
+    finally:
+        os.close(dir_fd)
+
     return os.fdopen(fd, "wb" if binary else "w", encoding=None if binary else "utf-8")
 
 

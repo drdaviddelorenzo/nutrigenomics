@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.6] - 2026-09-12
+
+### Security
+- **Output writes are now pinned to a real parent directory.** `O_NOFOLLOW` guards only the
+  final path component, so a symlinked parent directory could still redirect a write. The parent
+  is now opened with `O_DIRECTORY | O_NOFOLLOW` and the file created relative to that descriptor,
+  which pins a real directory inode and defeats a later swap of the parent. Verified by pointing
+  a parent directory at another location and confirming the write is refused and nothing reaches
+  the target. (ClawHub audit of 0.3.5: parent-directory symlink race.)
+
+### Fixed
+- **The AncestryDNA parser no longer loads the whole file into memory.** It read every line into
+  a list before parsing, so memory use scaled with input size — a denial-of-service risk on large
+  consumer genetic files. Comment lines are now filtered by a generator passed straight to
+  `csv.DictReader`, which accepts any iterable of strings, so the file streams. (ClawHub audit of
+  0.3.5, T09 memory exhaustion.) The other three parsers already streamed.
+- Removed dead code in the same parser: it opened the file, built a `DictReader`, then tested
+  `hasattr(reader, 'fieldnames')` — always true — so the result was discarded and the file was
+  opened a second time.
+
+### Added
+- Regression test covering refusal to write through a symlinked parent directory.
+
+---
+
 ## [0.3.5] - 2026-09-12
 
 ### Security

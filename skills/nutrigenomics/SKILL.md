@@ -1,7 +1,7 @@
 ---
 name: nutrigenomics
 description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-version: 0.3.5
+version: 0.3.6
 license: MIT
 compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
 metadata:
@@ -17,7 +17,7 @@ metadata:
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.5
+**Version**: 0.3.6
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+ (standard library only for the analysis; pandas, numpy, matplotlib and seaborn are needed only for figures)

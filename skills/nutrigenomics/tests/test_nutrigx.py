@@ -239,3 +239,25 @@ def test_safe_write_still_overwrites_regular_files(tmp_path):
     safe_write_text(path, "first")
     safe_write_text(path, "second")
     assert path.read_text(encoding="utf-8") == "second"
+
+
+def test_safe_write_refuses_symlinked_parent_directory(tmp_path):
+    """O_NOFOLLOW guards only the final component; the parent must be pinned too."""
+    from path_safety import safe_write_text
+
+    real_dir = tmp_path / "real"; real_dir.mkdir()
+    evil = tmp_path / "evil"; evil.mkdir()
+    link_dir = tmp_path / "link"; link_dir.symlink_to(evil)
+
+    try:
+        safe_write_text(link_dir / "report.md", "payload")
+    except ValueError as exc:
+        assert "symbolic link" in str(exc)
+    else:
+        raise AssertionError("write went through a symlinked parent directory")
+
+    assert not any(evil.iterdir()), "write escaped into the symlink target"
+
+    # a genuine directory is unaffected
+    safe_write_text(real_dir / "report.md", "ok")
+    assert (real_dir / "report.md").read_text(encoding="utf-8") == "ok"
