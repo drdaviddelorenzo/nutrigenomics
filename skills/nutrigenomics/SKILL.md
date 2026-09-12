@@ -1,7 +1,7 @@
 ---
 name: nutrigenomics
 description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-version: 0.3.3
+version: 0.3.4
 license: MIT
 compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
 metadata:
@@ -17,7 +17,7 @@ metadata:
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.3
+**Version**: 0.3.4
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+, pandas, numpy, matplotlib, seaborn, reportlab (optional)
@@ -109,7 +109,7 @@ The Bio Orchestrator should route to this skill when the user says anything like
 
 | Gene    | SNP        | Sensitivity          | Effect                          |
 |---------|------------|----------------------|---------------------------------|
-| MCM6    | rs4988235  | Lactose intolerance  | Non-persistence of lactase      |
+| MCM6    | rs4988235  | Lactose intolerance  | Risk allele G (-13910C) is non-persistence; the persistence allele A (-13910T) is dominant |
 | HLA-DQ2 | Proxy SNPs | Coeliac / gluten     | HLA-DQA1/DQB1 risk haplotypes   |
 
 ### Antioxidant & Detoxification
@@ -145,10 +145,15 @@ For each SNP in the panel:
 
 ### 3. Risk Scoring (`score_variants.py`)
 
-Each SNP is scored on a **0 / 0.5 / 1.0** scale:
+Each SNP is scored on a **0 / 0.5 / 1.0** scale by default:
 - `0.0` — homozygous reference (lowest risk)
 - `0.5` — heterozygous
 - `1.0` — homozygous risk allele
+
+Lactose (`rs4988235`) instead declares `inheritance: dominant_protective` in the panel. Lactase
+non-persistence is autosomal recessive, so one copy of the persistence allele is sufficient: AA
+and AG both score 0.0, and only GG scores 1.0. Any panel entry without an `inheritance` field is
+scored additively as above.
 
 Composite **Nutrient Risk Scores** (0–10) are computed per nutrient domain by
 summing weighted SNP scores. Weights are derived from reported effect sizes

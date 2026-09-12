@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.4] - 2026-09-12
+
+### Fixed
+- **`rs4988235` (MCM6 / lactase persistence) was scored backwards.** The reference and risk
+  alleles were reversed, so the risk allele was set to the lactase *persistence* allele: an
+  `AA` genotype scored 10/10 "elevated lactose risk" when it denotes full lactase persistence,
+  and vice versa. Lactose results in every report produced before this release are inverted at
+  this SNP.
+- **The lactose scoring model ignored the trait's inheritance.** Lactase non-persistence is
+  autosomal recessive (Enattah et al. 2002, PMID 11788828), so a single persistence allele is
+  sufficient. The additive 0 / 0.5 / 1.0 model scored heterozygotes at half risk when they are
+  lactase persistent. Panel entries may now declare
+  `"inheritance": "dominant_protective"`; entries without the field remain additive, so no
+  other SNP changes behaviour.
+- **`rs4988235` cited an unrelated paper.** PMID 12369657 is a study of musculoskeletal pain in
+  primary care. Replaced with PMID 11788828, the paper identifying the C/T-13910 variant.
+- `snp_raw_score` now raises on an unexpected `risk_count` instead of silently scoring 0.0.
+- Corrected `CONTRIBUTORS.md` links that pointed at a repository other than this one.
+
+### Credits
+- The `rs4988235` correction was identified and fixed by **krudo-taco** in the ClawBio `nutrigx`
+  skill (ClawBio/ClawBio@1163f49, MIT licence) and is adapted here with thanks. See
+  `CONTRIBUTORS.md`.
+
+---
+
 ## [0.3.3] - 2026-09-12
 
 ### Changed
