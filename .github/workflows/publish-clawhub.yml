@@ -30,7 +30,8 @@ jobs:
     with:
       skill_path: skills/nutrigenomics
       owner: drdaviddelorenzo
-      # On a manual run, honour the dry_run checkbox; on a push to main, publish for real.
-      dry_run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      # `inputs` does not exist on push events, so read github.event.inputs, which is null
+      # there: a manual run honours the checkbox, a push to main publishes for real.
+      dry_run: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' }}
     secrets:
       clawhub_token: ${{ secrets.CLAWHUB_TOKEN }}
