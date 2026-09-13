@@ -1,7 +1,7 @@
 ---
 name: nutrigenomics
 description: Generate a personalised nutrition report from your genetic data (23andMe, AncestryDNA, or VCF). Analyses 24 genes (28 SNPs) across 12 nutrient domains affecting nutrient metabolism, absorption, and food sensitivities. All processing is local — your genetic data never leaves your device.
-version: 0.3.10
+version: 0.3.11
 license: MIT
 compatibility: Requires Python 3.11+ with pandas, numpy, matplotlib and seaborn; runs fully offline with no network access
 metadata:
@@ -17,7 +17,7 @@ metadata:
 # Nutrigenomics — Personalised Nutrition from Genetic Data
 
 **Skill ID**: `nutrigenomics`
-**Version**: 0.3.10
+**Version**: 0.3.11
 **Status**: Beta
 **Author**: David de Lorenzo
 **Requires**: Python 3.11+ (standard library only for the analysis; pandas, numpy, matplotlib and seaborn are needed only for figures)
@@ -92,7 +92,7 @@ The Bio Orchestrator should route to this skill when the user says anything like
 |---------|------------|----------------------|---------------------------------|
 | FADS1   | rs174546   | LC-PUFA synthesis    | ↑/↓ EPA/DHA from ALA            |
 | FADS2   | rs1535     | LC-PUFA synthesis    | Modulates omega-6:omega-3 ratio |
-| ELOVL2  | rs953413   | DHA synthesis        | ↓ elongation of EPA→DHA         |
+| ELOVL2  | rs953413   | DHA synthesis        | A allele: lower EPA→DHA conversion |
 | APOE    | rs429358   | Saturated fat response | ε4 → ↑ LDL-C on high SFA diet |
 | APOE    | rs7412     | Saturated fat response | Combined with rs429358 for ε typing |
 
@@ -308,7 +308,7 @@ been checked against PubMed, and the panel splits into two tiers.
 
 **Tier 1 — GWAS-backed.** A catalogued genome-wide association exists for this exact variant
 and a trait matching its nutrient domain: MTHFR `rs1801133` and `rs1801131`, GC `rs4588`,
-FADS1 `rs174546`, FADS2 `rs1535`, ELOVL2 `rs953413`, APOE `rs429358` and `rs7412`,
+FADS1 `rs174546`, FADS2 `rs1535`, APOE `rs429358` and `rs7412`,
 SLC23A1 `rs33972313`, ALPL `rs1256335`, FTO `rs9939609`, TCF7L2 `rs7903146`,
 PPARG `rs1801282`, APOA5 `rs662799`, AHR `rs4410790`, ADH1B `rs1229984`, ALDH2 `rs671`,
 MCM6 `rs4988235`.
@@ -340,6 +340,27 @@ Four Tier 2 entries carry caveats that a reader should know about:
 
 `rs1805087` (MTR) is a genuine but modest determinant of homocysteine; its source study reports
 an effect independent of folate and B12 status, and larger in people with low vitamin B6.
+
+**`rs953413` (ELOVL2, omega-3)** sits between the tiers and is described on its own. The ELOVL2
+locus is genome-wide significant for n-3 fatty acids (Lemaitre et al. 2011), but through other,
+correlated SNPs; the GWAS Catalog holds no omega-3 association for `rs953413` itself. The direct
+evidence is:
+
+- **Association.** In Tanaka et al. 2009 (PMID 19148276) DHA fell from GG through AG to AA in two
+  cohorts, and the minor A allele went with higher EPA and DPA and lower DHA. The discovery signal
+  did not reach genome-wide significance; the DHA association replicated.
+- **Mechanism.** In liver cell lines the G allele gives higher ELOVL2 enhancer activity than A
+  (iScience 2020, PMID 31928966), consistent with A carriers converting less EPA to DHA.
+- **Supplementation.** Mixed. A carriers showed larger rises in blood EPA and DHA in the MARINA
+  trial (PMID 24292947) and a small 2025 study (PMID 40114193), but not in the seAFOod trial
+  (PMID 42135634).
+
+It is scored as an association with **lower EPA-to-DHA conversion**, not as a requirement: none of
+these studies shows that any genotype is deficient or needs a particular daily intake. The effect is
+modest, about 0.2 percentage points of DHA between GG and AA. Other ELOVL2 variants such as
+`rs3734398`, `rs2236212` and `rs3798713` are strongly correlated with it in European, East and South
+Asian ancestry, so they are not added as independent risks; doing so would count one signal several
+times.
 
 Treat Tier 2 scores as weaker signals than Tier 1 scores when interpreting a report.
 

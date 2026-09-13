@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.11] - 2026-09-13
+
+### Fixed
+- **`rs953413` (ELOVL2, omega-3) scored the wrong allele as risk.** The panel had
+  `ref_allele A`, `risk_allele G` for "decreased DHA synthesis", but the A allele is the one
+  associated with lower DHA. In Tanaka et al. 2009 (InCHIANTI and GOLDN, PMID 19148276) DHA fell
+  from GG through AG to AA in both cohorts (InCHIANTI 2.37 / 2.29 / 2.17, p = 0.004; GOLDN
+  3.32 / 3.20 / 3.10, p = 0.002), and the authors state that "the presence of the minor (A)
+  allele was associated with higher EPA/DPA and lower DHA". A functional study (iScience 2020,
+  PMID 31928966) found the G allele gives higher ELOVL2 enhancer activity than A. GG, the
+  highest-DHA genotype, was scored at maximum risk and AA at none. Now `ref G`, `risk A`.
+  Orientation checked against Ensembl: G/A on the plus strand in GRCh37 and GRCh38, and not
+  palindromic, so minus-strand T/C calls resolve correctly. **Omega-3 results for GG and AA
+  genotypes change in every report generated before this release; AG is unaffected.**
+- The citation for `rs953413` moves from Lemaitre et al. 2011 (PMID 21829377), which reports
+  ELOVL2 through other, correlated SNPs, to Tanaka et al. 2009, which reports this SNP.
+- `SKILL.md` listed `rs953413` in Evidence Quality Tier 1, defined as a catalogued genome-wide
+  association for the exact variant. The GWAS Catalog has no omega-3 association for it, so it
+  is now described separately with its actual evidence.
+
+### Changed
+- `rs953413` is described as an association with lower EPA-to-DHA conversion
+  (`lower_epa_to_dha_conversion`), not as a requirement. Supplementation studies are mixed:
+  minor-allele carriers showed larger EPA/DHA rises in the MARINA trial (PMID 24292947) and a
+  2025 study (PMID 40114193), but not in the seAFOod trial (PMID 42135634), and none sets a
+  genotype-specific intake.
+- The omega-3 report advice no longer implies deficiency or names a daily dose from genotype.
+  It points to direct EPA/DHA sources and to an omega-3 index test as the better guide to need.
+
+### Added
+- Regression tests pinning the `rs953413` direction on both strands (AA/TT = 2, AG = 1,
+  GG/CC = 0) and the panel entry.
+
+---
+
 ## [0.3.10] - 2026-09-12
 
 ### Fixed

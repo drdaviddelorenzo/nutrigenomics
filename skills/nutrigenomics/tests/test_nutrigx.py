@@ -167,6 +167,47 @@ def test_rs4988235_gg_and_cc_are_non_persistent():
         assert result["score"]["score"] == 10.0
 
 
+# ── ELOVL2 rs953413: A is the lower-DHA allele ────────────────────────────────
+# Tanaka et al. 2009 (PMID 19148276): DHA falls GG > AG > AA in two cohorts, and
+# "the presence of the minor (A) allele was associated with higher EPA/DPA and
+# lower DHA". The panel previously scored G as the risk allele. G/A is the plus
+# strand in GRCh37 and GRCh38; the SNP is not palindromic, so T/C calls on the
+# minus strand must resolve to the same counts.
+
+def _rs953413_call(genotype: str) -> dict:
+    return extract_snp_genotypes({"rs953413": genotype}, load_panel())["rs953413"]
+
+
+def test_rs953413_panel_direction_and_citation():
+    entry = next(s for s in load_panel() if s["rsid"] == "rs953413")
+    assert entry["ref_allele"] == "G"
+    assert entry["risk_allele"] == "A"
+    assert entry["pmid"] == "19148276"
+    assert entry["effect_direction"] == "lower_epa_to_dha_conversion"
+
+
+def test_rs953413_plus_strand_counts():
+    for genotype, expected in (("AA", 2), ("AG", 1), ("GA", 1), ("GG", 0)):
+        call = _rs953413_call(genotype)
+        assert call["status"] == "found", genotype
+        assert call["risk_count"] == expected, f"{genotype}: {call['risk_count']} != {expected}"
+        assert call.get("strand_ambiguous") is False
+
+
+def test_rs953413_minus_strand_counts():
+    for genotype, expected in (("TT", 2), ("TC", 1), ("CT", 1), ("CC", 0)):
+        call = _rs953413_call(genotype)
+        assert call["status"] == "found", genotype
+        assert call["risk_count"] == expected, f"{genotype}: {call['risk_count']} != {expected}"
+
+
+def test_rs953413_gg_scores_lower_omega3_risk_than_aa():
+    panel = load_panel()
+    gg = compute_nutrient_risk_scores(extract_snp_genotypes({"rs953413": "GG"}, panel), panel)["omega3"]
+    aa = compute_nutrient_risk_scores(extract_snp_genotypes({"rs953413": "AA"}, panel), panel)["omega3"]
+    assert gg["score"] < aa["score"]
+
+
 # ── Reproducibility bundle must not leak the input path ───────────────────────
 # Regression test for a privacy defect found by the ClawHub security audit of
 # 0.3.2: provenance.json and README_reproducibility.txt both echoed the full
