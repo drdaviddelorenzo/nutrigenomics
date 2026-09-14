@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.12] - 2026-09-14
+
+### Fixed
+- **Two citations named the wrong paper.** Both pointed at studies that list the SNP only in a
+  table of previously known loci:
+  - `rs174546` (FADS1) cited PMID 25646338, a trans fatty-acid GWAS whose FADS1 hit is `rs174548`.
+    Now PMID 20691134 (Zietemann et al. 2010, EPIC-Potsdam, n = 2066), which genotyped
+    `rs174546` and reports it against PUFA levels and estimated delta-5 desaturase activity.
+  - `rs4588` (GC) cited PMID 28757204, a CYP2R1 rare-variant paper (`rs117913124`). Now PMID
+    19116321 (Sinotte et al. 2009), which genotyped `rs4588` and reports each rare allele with
+    lower plasma 25(OH)D.
+
+  Found by the ClawBio maintainer review of the same panel. The GWAS Catalog lists every variant
+  appearing in a paper's known-loci table, which is not the same as the paper reporting it. No
+  scores change.
+
+---
+
 ## [0.3.11] - 2026-09-13
 
 ### Fixed
