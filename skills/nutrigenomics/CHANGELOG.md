@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.3.13] - 2026-09-15
+
+### Fixed
+- **Documentation figures no longer matched the panel.** README.md, README_OPENCLAW.md,
+  SKILL.md, and openclaw.json still quoted an earlier panel size ("40+ genes", "8 nutrient
+  categories", "58 SNPs"). Verified against `data/snp_panel.json` and corrected throughout to
+  24 genes, 28 SNPs, 12 nutrient domains. SKILL.md also now notes 3 candidate variants
+  (`ADRB2 rs1042713`, `HLA-DQ2`, `GSTT1`) that are documented for scientific context but not
+  yet scored.
+- **Generated report printed a stale tool version.** `generate_report.py` hardcoded
+  `Nutrigenomics v0.2.8` in the report header regardless of the installed skill version. Now
+  reads the version via `repro_bundle._skill_version()`, the same helper `provenance.json`
+  already used, so the two cannot drift apart again.
+
+---
 ## [0.3.12] - 2026-09-14
 
 ### Fixed
