@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 
 from path_safety import safe_open_write, safe_write_text
+from repro_bundle import _skill_version
 
 
 DOMAIN_LABELS = {
@@ -159,7 +160,7 @@ def generate_report(snp_calls, risk_scores, snp_panel, output_dir, figures=True,
         "# Nutrigenomics Personalised Nutrition Report",
         "",
         f"**Generated**: {timestamp}  ",
-        f"**Tool**: Nutrigenomics v0.2.8  ",
+        f"**Tool**: Nutrigenomics v{_skill_version()}  ",
         f"**Input**: `{safe_display_filename(input_file)}`  ",
         "",
         "> **Disclaimer**: This report is for research and educational purposes only. "
